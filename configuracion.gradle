@@ -1,0 +1,44 @@
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.Yaml
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.3.2'
+    }
+}
+
+project.ext {
+    archivoConfiguracion = 'servicio.yml'
+}
+
+task expandirConfig(type: Copy) {
+    def hostBaseDeDatos = obtenerValorDesdeVariableDeEntorno("null", "localhost")
+    def clave = obtenerValorDesdeVariableDeEntorno("null", "sniese")
+
+    from('.')
+    include('**/*.yml.template')
+    rename { String fileName -> fileName.replace('.template', '') }
+    expand(host: hostBaseDeDatos, claveSnieseKeyStore: clave)
+    into('.')
+}
+
+task configurarServicio(dependsOn: expandirConfig) {
+    doLast {
+        def yamlConfig = new Yaml().load(new File(archivoConfiguracion).newReader())
+        def dbConfig = yamlConfig.database
+        project.ext['flyway.user'] = dbConfig.user
+        project.ext['flyway.password'] = dbConfig.password
+        project.ext['flyway.url'] = dbConfig.url
+        project.ext['flyway.schemas'] = dbConfig.properties.'hibernate.default_schema'
+    }
+}
+
+def obtenerValorDesdeVariableDeEntorno(variableEntorno, valorPorDefecto) {
+    def valorNulo = "null"
+    if (variableEntorno == valorNulo) {
+        return valorPorDefecto
+    }
+    return variableEntorno
+}

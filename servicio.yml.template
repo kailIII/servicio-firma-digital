@@ -1,0 +1,46 @@
+database:
+  driverClass: org.postgresql.Driver
+  user: thoughtworks
+  password: Passw0rd
+  url: jdbc:postgresql://${host}/senescyt
+  maxWaitForConnection: 1s
+  validationQuery: "/* DB Health Check */ SELECT 1"
+  initialSize: 1
+  minSize: 1
+  maxSize: 2
+  checkConnectionWhileIdle: false
+  properties:
+    charSet: UTF-8
+    hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate.show_sql: false
+    hibernate.default_schema: servicio_firma_digital
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      threshold: INFO
+      target: stderr
+      timeZone: EST
+    - type: file
+      threshold: INFO
+      currentLogFilename: ./logs/servicio.log
+      archivedLogFilenamePattern: ./logs/servicio-%d.log.gz
+      archivedFileCount: 5
+      timeZone: EST
+
+server:
+  adminConnectors:
+    - type: http
+      port: 8458
+  applicationConnectors:
+    - type: http
+      port: 8108
+    - type: https
+      port: 8457
+      keyStorePath: sniese.keystore
+      keyStorePassword: ${claveSnieseKeyStore}
+      validateCerts: false
+
+auditoria:
+  writerClass: ec.gob.senescyt.microservicios.commons.bundles.audit.LogAuditoriaWriter
