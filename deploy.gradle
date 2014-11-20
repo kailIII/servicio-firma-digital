@@ -28,7 +28,7 @@ task deployQA(type: SshTask) {
         def targetDir = "/home/sniese/servicios/servicio-firma-digital/"
         execute "mkdir -p ${targetDir}"
         put 'build/libs/servicio-standalone.jar', targetDir
-        put 'servicio-qa.yml', targetDir + 'servicio.yml'
+        put 'servicio.yml', targetDir + 'servicio.yml'
         put 'sniese.keystore', targetDir
         executeSudo "service servicio-firma-digital restart", pty: true
     }
