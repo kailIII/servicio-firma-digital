@@ -1,8 +1,8 @@
 package ec.gob.senescyt.firma.resources;
 
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
-import ec.gob.senescyt.firma.core.InformacionFirma;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
+import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
 import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
 import ec.gob.senescyt.microservicios.commons.security.Usuario;
