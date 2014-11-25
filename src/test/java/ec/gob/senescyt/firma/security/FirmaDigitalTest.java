@@ -1,6 +1,6 @@
 package ec.gob.senescyt.firma.security;
 
-import ec.gob.senescyt.firma.core.InformacionFirma;
+import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import org.junit.Test;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;

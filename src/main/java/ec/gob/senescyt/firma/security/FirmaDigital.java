@@ -1,6 +1,6 @@
 package ec.gob.senescyt.firma.security;
 
-import ec.gob.senescyt.firma.core.InformacionFirma;
+import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 
 public class FirmaDigital {
     public byte[] firmar(InformacionFirma informacionFirma) {
