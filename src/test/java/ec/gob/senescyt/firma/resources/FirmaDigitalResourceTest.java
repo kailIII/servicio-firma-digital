@@ -7,6 +7,7 @@ import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
 import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
 import ec.gob.senescyt.microservicios.commons.security.Usuario;
 import ec.gob.senescyt.microservicios.commons.security.UsuarioAutenticado;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -48,8 +49,8 @@ public class FirmaDigitalResourceTest {
     public void setUp() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         initMocks(this);
         recurso = new FirmaDigitalResource(servicioFirmaDigital, principalProvider);
-        informacionFirma = new InformacionFirma(randomAlphabetic(300), randomAlphabetic(10), randomAlphabetic(10));
         usuario = new UsuarioAutenticado(randomAlphabetic(10), randomAlphabetic(10));
+        informacionFirma = new InformacionFirma(randomAlphabetic(300), usuario.getNombreUsuario(), randomAlphabetic(10));
         when(servicioFirmaDigital.firmar(informacionFirma)).thenReturn(documentoFirmado);
         when(principalProvider.obtenerUsuario()).thenReturn(usuario);
     }
@@ -78,6 +79,13 @@ public class FirmaDigitalResourceTest {
         ArgumentCaptor<InformacionFirma> capturador = ArgumentCaptor.forClass(InformacionFirma.class);
         verify(servicioFirmaDigital, times(1)).firmar(capturador.capture());
         assertThat(capturador.getValue().getNombreUsuario(), is(usuario.getNombreUsuario()));
+    }
+
+    @Test
+    public void debeRetornar400ProhibidoSiElNombreDeUsuarioNoCoincideConElDeLaInformacion() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+        informacionFirma.setNombreUsuario(randomAlphabetic(10));
+        Response respuesta = recurso.crearFirmaDigital(informacionFirma);
+        assertThat(respuesta.getStatus(), is(HttpStatus.BAD_REQUEST_400));
     }
 
     @Test

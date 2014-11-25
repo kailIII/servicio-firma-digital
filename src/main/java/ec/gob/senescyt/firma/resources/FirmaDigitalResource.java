@@ -7,7 +7,6 @@ import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
 import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
 
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
@@ -16,6 +15,7 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
+import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
 import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
 
 @RecursoSeguro
@@ -29,9 +29,16 @@ public class FirmaDigitalResource {
     }
 
     public Response crearFirmaDigital(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
-        String nombreUsuario = principalProvider.obtenerUsuario().getNombreUsuario();
-        informacionFirma.setNombreUsuario(nombreUsuario);
-        DocumentoFirmado documentoFirmado = servicioFirmaDigital.firmar(informacionFirma);
-        return Response.status(CREATED_201).entity(documentoFirmado).build();
+        if (coincideUsuarioConLaInformacion(informacionFirma)) {
+            DocumentoFirmado documentoFirmado = servicioFirmaDigital.firmar(informacionFirma);
+            return Response.status(CREATED_201).entity(documentoFirmado).build();
+        }
+        return Response.status(BAD_REQUEST_400).build();
     }
+
+    private boolean coincideUsuarioConLaInformacion(InformacionFirma informacionFirma) {
+        String nombreUsuario = principalProvider.obtenerUsuario().getNombreUsuario();
+        return nombreUsuario.equals(informacionFirma.getNombreUsuario());
+    }
+
 }
