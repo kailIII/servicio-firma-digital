@@ -8,6 +8,14 @@ import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
 
 import javax.ws.rs.core.Response;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+
 import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
 
 @RecursoSeguro
@@ -20,7 +28,7 @@ public class FirmaDigitalResource {
         this.principalProvider = principalProvider;
     }
 
-    public Response crearFirmaDigital(InformacionFirma informacionFirma) {
+    public Response crearFirmaDigital(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         String nombreUsuario = principalProvider.obtenerUsuario().getNombreUsuario();
         informacionFirma.setNombreUsuario(nombreUsuario);
         DocumentoFirmado documentoFirmado = servicioFirmaDigital.firmar(informacionFirma);

@@ -14,6 +14,14 @@ import org.mockito.Mock;
 
 import javax.ws.rs.core.Response;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -37,7 +45,7 @@ public class FirmaDigitalResourceTest {
     private FirmaDigitalResource recurso;
 
     @Before
-    public void setUp() {
+    public void setUp() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         initMocks(this);
         recurso = new FirmaDigitalResource(servicioFirmaDigital, principalProvider);
         informacionFirma = new InformacionFirma(randomAlphabetic(300), randomAlphabetic(10), randomAlphabetic(10));
@@ -47,25 +55,25 @@ public class FirmaDigitalResourceTest {
     }
 
     @Test
-    public void debeRetornar201CreadorCuandoRecibeUnaSolicitudDeFirma() {
+    public void debeRetornar201CreadorCuandoRecibeUnaSolicitudDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getStatus(), is(CREATED_201));
     }
 
     @Test
-    public void debeRetornarDocumentoFirmadoCuandoRecibeUnaSolicitudDeFirma() {
+    public void debeRetornarDocumentoFirmadoCuandoRecibeUnaSolicitudDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getEntity(), instanceOf(DocumentoFirmado.class));
     }
 
     @Test
-    public void debeRetornarLaInstanciaDelDocumentoFirmado() {
+    public void debeRetornarLaInstanciaDelDocumentoFirmado() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getEntity(), is(documentoFirmado));
     }
 
     @Test
-    public void debeAsignarElNombreDeUsuarioALaInformacionDeFirmaAntesDeEnviarAFirmar() {
+    public void debeAsignarElNombreDeUsuarioALaInformacionDeFirmaAntesDeEnviarAFirmar() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         recurso.crearFirmaDigital(informacionFirma);
         ArgumentCaptor<InformacionFirma> capturador = ArgumentCaptor.forClass(InformacionFirma.class);
         verify(servicioFirmaDigital, times(1)).firmar(capturador.capture());
