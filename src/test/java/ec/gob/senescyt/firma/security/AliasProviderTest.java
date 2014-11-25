@@ -18,15 +18,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ KeyStore.class, AliasProvider.class })
 public class AliasProviderTest {
 
-    private boolean[] usosLlaveParaFirmar = new boolean[]{true, false};
-    private boolean[] usosLlaveParaOtrosFines = new boolean[]{false, true};
-    private boolean[] llavesSinUso = null;
+    private final static boolean[] usosLlaveParaFirmar = new boolean[]{true, false};
+    private final static boolean[] usosLlaveParaOtrosFines = new boolean[]{false, true};
+    private final static boolean[] llavesSinUso = null;
     private KeyStore almacenLlaves;
     private AliasProvider aliasProvider;
     private Enumeration listadoAlias;
@@ -35,7 +34,6 @@ public class AliasProviderTest {
 
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
         almacenLlaves = PowerMockito.mock(KeyStore.class);
         listadoAlias = PowerMockito.mock(Enumeration.class);
         certificado = mock(X509Certificate.class);
