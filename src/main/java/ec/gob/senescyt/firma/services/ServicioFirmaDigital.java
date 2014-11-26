@@ -15,6 +15,7 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Base64;
+import java.util.Optional;
 
 public class ServicioFirmaDigital {
     private final FirmaDigital firmaDigital;
@@ -39,5 +40,11 @@ public class ServicioFirmaDigital {
         String resultadoFirmaDigital = Base64.getEncoder().encodeToString(resultadoFirma);
         DocumentoFirmado documentoFirmado = new DocumentoFirmado(resultadoFirmaDigital, configuracionFirma);
         return documentoFirmadoDAO.guardar(documentoFirmado);
+    }
+
+    public boolean validarCredencialesFirma(String nombreUsuario, String contrasenia) throws CertificateException, IOException {
+        Optional<ConfiguracionFirma> configuracionFirma = configuracionFirmaDAO.obtenerPorUsuario(nombreUsuario);
+        return configuracionFirma.isPresent() &&
+               firmaDigital.existeLlavePrivadaParaFirmar(configuracionFirma.get().getCaminoArchivo(), contrasenia);
     }
 }

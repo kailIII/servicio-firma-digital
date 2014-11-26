@@ -29,7 +29,7 @@ public class FirmaDigital {
         return signature.sign();
     }
 
-    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws CertificateException, IOException {
         try {
             PrivateKey privateKey = almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
             return privateKey != null;

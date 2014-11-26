@@ -45,11 +45,16 @@ public class ServicioFirmaDigitalTest {
     private InformacionFirma informacionFirma;
     private ConfiguracionFirma configuracionFirma;
     private byte[] firmaEsperada;
+    private String nombreUsuario;
+    private String contrasenia;
 
     @Before
     public void setUp() throws IOException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException {
         initMocks(this);
-        informacionFirma = new InformacionFirma(randomAlphabetic(300), randomAlphabetic(10), randomAlphabetic(10));
+        String textoAFirmar = randomAlphabetic(300);
+        nombreUsuario = randomAlphabetic(10);
+        contrasenia = randomAlphabetic(10);
+        informacionFirma = new InformacionFirma(textoAFirmar, nombreUsuario, contrasenia);
         servicio = new ServicioFirmaDigital(firmaDigital, configuracionFirmaDAO, documentoFirmadoDAO);
         configuracionFirma = new ConfiguracionFirma(randomAlphabetic(10), informacionFirma.getNombreUsuario());
         firmaEsperada = randomAlphabetic(10).getBytes("UTF-8");
@@ -78,5 +83,26 @@ public class ServicioFirmaDigitalTest {
         ArgumentCaptor<DocumentoFirmado> capturador = ArgumentCaptor.forClass(DocumentoFirmado.class);
         verify(documentoFirmadoDAO, times(1)).guardar(capturador.capture());
         assertThat(capturador.getValue().getConfiguracionFirma(), is(configuracionFirma));
+    }
+
+    @Test
+    public void debeRetornarVerdaderoSiLasCredencialesNoSonValidasParaFirmar() throws CertificateException, IOException {
+        when(firmaDigital.existeLlavePrivadaParaFirmar(configuracionFirma.getCaminoArchivo(), contrasenia)).thenReturn(true);
+        boolean sonValidas = servicio.validarCredencialesFirma(nombreUsuario, contrasenia);
+        assertThat(sonValidas, is(true));
+    }
+
+    @Test
+    public void debeRetornarFalsoSiLasCredencialesNoSonValidasParaFirmar() throws CertificateException, IOException {
+        when(firmaDigital.existeLlavePrivadaParaFirmar(configuracionFirma.getCaminoArchivo(), contrasenia)).thenReturn(false);
+        boolean sonValidas = servicio.validarCredencialesFirma(nombreUsuario, contrasenia);
+        assertThat(sonValidas, is(false));
+    }
+
+    @Test
+    public void debeRetornarFalsoSiNoExisteConfiguracionParaElUsuario() throws CertificateException, IOException {
+        when(configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario())).thenReturn(Optional.empty());
+        boolean sonValidas = servicio.validarCredencialesFirma(nombreUsuario, contrasenia);
+        assertThat(sonValidas, is(false));
     }
 }
