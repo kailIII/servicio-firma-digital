@@ -10,7 +10,7 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
-public class AlmacenLlavesPkcs12Provider {
+public class AlmacenLlavesPkcs12Provider implements AlmacenLlavesProvider {
     public static final String ALMACEN_PKCS12 = "PKCS12";
     private KeyStore almacenLlaves;
     private AliasProvider aliasProvider;
@@ -20,7 +20,7 @@ public class AlmacenLlavesPkcs12Provider {
         this.almacenLlaves = KeyStore.getInstance(ALMACEN_PKCS12);
     }
 
-    public PrivateKey obtenerLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
+    public PrivateKey obtenerLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
         cargarArchivosDeFirma(caminoArchivo, contrasenia);
         String aliasParaFirmar = aliasProvider.obtenerPrimerAliasParaFirmar(almacenLlaves);
         return (PrivateKey) almacenLlaves.getKey(aliasParaFirmar, contrasenia.toCharArray());

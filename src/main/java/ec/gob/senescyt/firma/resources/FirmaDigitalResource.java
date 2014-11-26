@@ -6,6 +6,9 @@ import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
 import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -19,6 +22,8 @@ import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
 import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
 
 @RecursoSeguro
+@Path("/firmaDigital")
+@Produces(MediaType.APPLICATION_JSON)
 public class FirmaDigitalResource {
     private ServicioFirmaDigital servicioFirmaDigital;
     private PrincipalProvider principalProvider;

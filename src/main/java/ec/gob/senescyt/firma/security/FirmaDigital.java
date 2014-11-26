@@ -14,10 +14,10 @@ import java.security.cert.CertificateException;
 public class FirmaDigital {
 
     private static final String SHA_1_WITH_RSA = "SHA1withRSA";
-    private AlmacenLlavesPkcs12Provider almacenLlaves;
+    private AlmacenLlavesProvider almacenLlaves;
     private Signature signature;
 
-    public FirmaDigital(AlmacenLlavesPkcs12Provider almacenLlaves) throws NoSuchAlgorithmException {
+    public FirmaDigital(AlmacenLlavesProvider almacenLlaves) throws NoSuchAlgorithmException {
         this.almacenLlaves = almacenLlaves;
         signature = Signature.getInstance(SHA_1_WITH_RSA);
     }

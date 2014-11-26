@@ -1,23 +1,41 @@
 package ec.gob.senescyt;
 
 import com.google.common.annotations.VisibleForTesting;
-import ec.gob.senescyt.commons.bundles.DBMigrationsBundle;
+import ec.gob.senescyt.firma.core.ConfiguracionFirma;
+import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
+import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
+import ec.gob.senescyt.firma.resources.FirmaDigitalResource;
+import ec.gob.senescyt.firma.security.AliasProvider;
+import ec.gob.senescyt.firma.security.AlmacenLlavesPkcs12Provider;
+import ec.gob.senescyt.firma.security.AlmacenLlavesProvider;
+import ec.gob.senescyt.firma.security.FirmaDigital;
+import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
 import ec.gob.senescyt.microservicios.commons.MicroservicioAplicacion;
+import ec.gob.senescyt.microservicios.commons.MicroservicioConfiguracion;
+import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
+import ec.gob.senescyt.microservicios.commons.security.PrincipalProviderImpl;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.hibernate.SessionFactory;
 
-public class ServicioApplication extends MicroservicioAplicacion<ServicioConfiguration> {
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Logger;
 
-    private final DBMigrationsBundle flywayBundle = new DBMigrationsBundle();
-    private final HibernateBundle<ServicioConfiguration> hibernate = new HibernateBundle<ServicioConfiguration>(null) {
+public class ServicioApplication extends MicroservicioAplicacion<MicroservicioConfiguracion> {
+
+    private final HibernateBundle<MicroservicioConfiguracion> hibernate = new HibernateBundle<MicroservicioConfiguracion>(
+            ConfiguracionFirma.class) {
         @Override
-        public DataSourceFactory getDataSourceFactory(ServicioConfiguration configuration) {
+        public DataSourceFactory getDataSourceFactory(MicroservicioConfiguracion configuration) {
             return configuration.getDataSourceFactory();
         }
     };
+    private String defaultSchema;
+    private static final Logger LOGGER = Logger.getLogger(ServicioApplication.class.getName());
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public static void main(String[] args) throws Exception {
@@ -30,18 +48,37 @@ public class ServicioApplication extends MicroservicioAplicacion<ServicioConfigu
     }
 
     @Override
-    public void inicializar(Bootstrap<ServicioConfiguration> bootstrap) {
-        bootstrap.addBundle(flywayBundle);
+    public void inicializar(Bootstrap<MicroservicioConfiguracion> bootstrap) {
+        // no hace nada
     }
 
     @Override
-    public void ejecutar(ServicioConfiguration servicioConfiguration, Environment environment) {
-//        JerseyEnvironment jerseyEnvironment = environment.jersey();
-//        jerseyEnvironment.register(ejemploResource);
+    public void ejecutar(MicroservicioConfiguracion servicioConfiguration, Environment environment) {
+        JerseyEnvironment jerseyEnvironment = environment.jersey();
+        this.defaultSchema = servicioConfiguration.getDefaultSchema();
+        configurarRecursoFirmaDigital(jerseyEnvironment);
+    }
+
+    private void configurarRecursoFirmaDigital(JerseyEnvironment jerseyEnvironment) {
+        AliasProvider aliasProvider = new AliasProvider();
+        AlmacenLlavesProvider almacenLlavesProvider = null;
+        FirmaDigital firmaDigital = null;
+        try {
+            almacenLlavesProvider = new AlmacenLlavesPkcs12Provider(aliasProvider);
+            firmaDigital = new FirmaDigital(almacenLlavesProvider);
+        } catch (KeyStoreException | NoSuchAlgorithmException e) {
+            LOGGER.severe(e.getMessage());
+        }
+        ConfiguracionFirmaDAO configuracionFirmaDAO = new ConfiguracionFirmaDAO(getSessionFactory(), defaultSchema);
+        DocumentoFirmadoDAO documentoFirmadoDAO = new DocumentoFirmadoDAO(getSessionFactory(), defaultSchema);
+        ServicioFirmaDigital servicioFirmaDigital = new ServicioFirmaDigital(firmaDigital, configuracionFirmaDAO, documentoFirmadoDAO);
+        PrincipalProvider principalProvider = new PrincipalProviderImpl();
+        FirmaDigitalResource firmaDigitalResource = new FirmaDigitalResource(servicioFirmaDigital, principalProvider);
+        jerseyEnvironment.register(firmaDigitalResource);
     }
 
     @Override
-    protected HibernateBundle<ServicioConfiguration> getHibernate() {
+    protected HibernateBundle<MicroservicioConfiguracion> getHibernate() {
         return hibernate;
     }
 

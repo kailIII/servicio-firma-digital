@@ -2,7 +2,22 @@ package ec.gob.senescyt.firma.core;
 
 import ec.gob.senescyt.microservicios.commons.core.EntidadBase;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+
+@Entity
+@Table(name = "configuraciones_firmas")
 public class ConfiguracionFirma extends EntidadBase{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SuppressWarnings("PMD.UnusedPrivateField")
+    private long id;
+
     private String caminoArchivo;
     private String nombreUsuario;
 
