@@ -34,7 +34,7 @@ public class FirmaDigital {
             PrivateKey privateKey = almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
             return privateKey != null;
         }
-        catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException ex) {
+        catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException ex) {
             return false;
         }
     }

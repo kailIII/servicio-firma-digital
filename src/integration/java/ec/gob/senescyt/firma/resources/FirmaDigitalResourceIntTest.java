@@ -15,6 +15,8 @@ import java.net.URL;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
 import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
+import static org.eclipse.jetty.http.HttpStatus.NOT_FOUND_404;
+import static org.eclipse.jetty.http.HttpStatus.OK_200;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
@@ -55,5 +57,17 @@ public class FirmaDigitalResourceIntTest extends RecursoSeguroIntegracionTest {
         InformacionFirma informacionFirma = new InformacionFirma(randomAlphabetic(600), randomAlphabetic(10), CONTRASENIA);
         ClientResponse respuesta = hacerPost("firmaDigital", informacionFirma);
         assertThat(respuesta.getStatus(), is(BAD_REQUEST_400));
+    }
+
+    @Test
+    public void debeRetornar200OkCuandoLasCredencialesSonValidas() {
+        ClientResponse respuesta = hacerPost("firmaDigital/credenciales/validar", CONTRASENIA);
+        assertThat(respuesta.getStatus(), is(OK_200));
+    }
+
+    @Test
+    public void debeRetornar404NotFoundCuandoLasCredencialesSonInvalidas() {
+        ClientResponse respuesta = hacerPost("firmaDigital/credenciales/validar", randomAlphabetic(12));
+        assertThat(respuesta.getStatus(), is(NOT_FOUND_404));
     }
 }

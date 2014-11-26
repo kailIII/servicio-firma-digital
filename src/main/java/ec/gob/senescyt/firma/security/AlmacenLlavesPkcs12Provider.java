@@ -27,15 +27,8 @@ public class AlmacenLlavesPkcs12Provider implements AlmacenLlavesProvider {
     }
 
     private void cargarArchivosDeFirma(String caminoArchivo, String contrasenia) throws IOException, NoSuchAlgorithmException, CertificateException {
-        InputStream archivo = null;
-        try {
-            archivo = new FileInputStream(caminoArchivo);
+        try(InputStream archivo = new FileInputStream(caminoArchivo)) {
             almacenLlaves.load(archivo, contrasenia.toCharArray());
-        }
-        finally {
-            if (archivo != null) {
-                archivo.close();
-            }
         }
     }
 }

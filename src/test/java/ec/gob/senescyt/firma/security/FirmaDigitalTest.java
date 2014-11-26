@@ -113,4 +113,11 @@ public class FirmaDigitalTest {
         boolean existeLlave = firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
         assertThat(existeLlave, is(false));
     }
+
+    @Test
+    public void debeRetornarFalsoCuandoNoEsPosibleAbrirElAlmacenDeLlaves() throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        doThrow(new IOException()).when(almacenLlaves).obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        boolean existeLlave = firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        assertThat(existeLlave, is(false));
+    }
 }

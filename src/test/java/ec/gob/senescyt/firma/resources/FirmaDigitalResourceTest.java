@@ -25,6 +25,8 @@ import java.security.cert.CertificateException;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
+import static org.eclipse.jetty.http.HttpStatus.NOT_FOUND_404;
+import static org.eclipse.jetty.http.HttpStatus.OK_200;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,13 +46,15 @@ public class FirmaDigitalResourceTest {
     private Usuario usuario;
     private InformacionFirma informacionFirma;
     private FirmaDigitalResource recurso;
+    private String contrasenia;
 
     @Before
     public void setUp() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         initMocks(this);
         recurso = new FirmaDigitalResource(servicioFirmaDigital, principalProvider);
         usuario = new UsuarioAutenticado(randomAlphabetic(10), randomAlphabetic(10));
-        informacionFirma = new InformacionFirma(randomAlphabetic(300), usuario.getNombreUsuario(), randomAlphabetic(10));
+        contrasenia = randomAlphabetic(10);
+        informacionFirma = new InformacionFirma(randomAlphabetic(300), usuario.getNombreUsuario(), contrasenia);
         when(servicioFirmaDigital.firmar(informacionFirma)).thenReturn(documentoFirmado);
         when(principalProvider.obtenerUsuario()).thenReturn(usuario);
     }
@@ -86,6 +90,20 @@ public class FirmaDigitalResourceTest {
         informacionFirma = new InformacionFirma(randomAlphabetic(10), randomAlphabetic(10), randomAlphabetic(10));
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getStatus(), is(HttpStatus.BAD_REQUEST_400));
+    }
+
+    @Test
+    public void debeRetornar200OkSiLasCredencialesSonValidas() throws CertificateException, IOException {
+        when(servicioFirmaDigital.validarCredencialesFirma(usuario.getNombreUsuario(), contrasenia)).thenReturn(true);
+        Response respuesta = recurso.validarCredenciales(contrasenia);
+        assertThat(respuesta.getStatus(), is(OK_200));
+    }
+
+    @Test
+    public void debeRetornar404NotFoundCuandoLasCredencialesSonInvalidas() throws CertificateException, IOException {
+        when(servicioFirmaDigital.validarCredencialesFirma(usuario.getNombreUsuario(), contrasenia)).thenReturn(false);
+        Response respuesta = recurso.validarCredenciales(contrasenia);
+        assertThat(respuesta.getStatus(), is(NOT_FOUND_404));
     }
 
     @Test

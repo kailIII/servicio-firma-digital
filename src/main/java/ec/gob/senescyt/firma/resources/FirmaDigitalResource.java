@@ -22,6 +22,8 @@ import java.security.cert.CertificateException;
 
 import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
 import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
+import static org.eclipse.jetty.http.HttpStatus.NOT_FOUND_404;
+import static org.eclipse.jetty.http.HttpStatus.OK_200;
 
 @RecursoSeguro
 @Path("/firmaDigital")
@@ -50,4 +52,13 @@ public class FirmaDigitalResource {
         return nombreUsuario.equals(informacionFirma.getNombreUsuario());
     }
 
+    @POST
+    @Path("credenciales/validar")
+    @UnitOfWork
+    public Response validarCredenciales(String contrasenia) throws CertificateException, IOException {
+        boolean sonCredencialesValidas = servicioFirmaDigital.validarCredencialesFirma(
+                principalProvider.obtenerUsuario().getNombreUsuario(), contrasenia);
+        int codigoRespuesta = sonCredencialesValidas ? OK_200 : NOT_FOUND_404;
+        return Response.status(codigoRespuesta).build();
+    }
 }
