@@ -20,14 +20,22 @@ public class ConfiguracionFirma extends EntidadBase{
 
     private String caminoArchivo;
     private String nombreUsuario;
+    private boolean activa;
 
     protected ConfiguracionFirma() {
         // PMD
     }
 
+    public ConfiguracionFirma(String nombreUsuario, String caminoArchivo, boolean activa) {
+        this.nombreUsuario = nombreUsuario;
+        this.caminoArchivo = caminoArchivo;
+        this.activa = activa;
+    }
+
     public ConfiguracionFirma(String nombreUsuario, String caminoArchivo) {
         this.nombreUsuario = nombreUsuario;
         this.caminoArchivo = caminoArchivo;
+        this.activa = true;
     }
 
     public String getCaminoArchivo() {
@@ -36,5 +44,9 @@ public class ConfiguracionFirma extends EntidadBase{
 
     public String getNombreUsuario() {
         return nombreUsuario;
+    }
+
+    public boolean getActiva() {
+        return activa;
     }
 }
