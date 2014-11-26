@@ -46,7 +46,7 @@ public class ConfiguracionFirma extends EntidadBase{
         return nombreUsuario;
     }
 
-    public boolean getActiva() {
+    public boolean isActiva() {
         return activa;
     }
 }

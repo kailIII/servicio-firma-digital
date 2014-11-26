@@ -35,12 +35,12 @@ public class ConfiguracionFirmaTest {
 
     @Test
     public void debeTenerUnCampoIndicandoSiEstaActiva() {
-        assertThat(configuracionFirma.getActiva(), is(activa));
+        assertThat(configuracionFirma.isActiva(), is(activa));
     }
 
     @Test
     public void debeSerActivaPorDefecto() {
         configuracionFirma = new ConfiguracionFirma(nombreUsuario, caminoArchivo);
-        assertThat(configuracionFirma.getActiva(), is(true));
+        assertThat(configuracionFirma.isActiva(), is(true));
     }
 }

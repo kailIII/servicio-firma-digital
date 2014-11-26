@@ -30,7 +30,7 @@ public class ServicioFirmaDigital {
     }
 
     public DocumentoFirmado firmar(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
-        ConfiguracionFirma configuracionFirma = configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario());
+        ConfiguracionFirma configuracionFirma = configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario()).get();
 
         byte[] firmaDigital = this.firmaDigital.firmar(informacionFirma.getTextoAFirmar(),
                                                        configuracionFirma.getCaminoArchivo(),

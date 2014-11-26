@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Optional;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.is;
@@ -52,7 +53,7 @@ public class ServicioFirmaDigitalTest {
         servicio = new ServicioFirmaDigital(firmaDigital, configuracionFirmaDAO, documentoFirmadoDAO);
         configuracionFirma = new ConfiguracionFirma(randomAlphabetic(10), informacionFirma.getNombreUsuario());
         firmaEsperada = randomAlphabetic(10).getBytes("UTF-8");
-        when(configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario())).thenReturn(configuracionFirma);
+        when(configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario())).thenReturn(Optional.of(configuracionFirma));
         when(firmaDigital.firmar(informacionFirma.getTextoAFirmar(),configuracionFirma.getCaminoArchivo(), informacionFirma.getContrasenia())).thenReturn(firmaEsperada);
     }
 

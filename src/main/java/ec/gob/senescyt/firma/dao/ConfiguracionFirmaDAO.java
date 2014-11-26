@@ -2,7 +2,11 @@ package ec.gob.senescyt.firma.dao;
 
 import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.microservicios.commons.dao.AbstractServicioDAO;
+import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
+
+import java.util.Optional;
 
 public class ConfiguracionFirmaDAO extends AbstractServicioDAO<ConfiguracionFirma> {
 
@@ -10,7 +14,11 @@ public class ConfiguracionFirmaDAO extends AbstractServicioDAO<ConfiguracionFirm
         super(sessionFactory, defaultSchema);
     }
 
-    public ConfiguracionFirma obtenerPorUsuario(String nombreUsuario) {
-        return null;
+    public Optional<ConfiguracionFirma> obtenerPorUsuario(String nombreUsuario) {
+        Criteria criteria = obtenerCriteria();
+        criteria.add(Restrictions.eq("nombreUsuario", nombreUsuario));
+        criteria.add(Restrictions.eq("activa", true));
+        criteria.setMaxResults(1);
+        return criteria.list().stream().findFirst();
     }
 }
