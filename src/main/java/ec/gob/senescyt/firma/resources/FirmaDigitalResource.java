@@ -5,7 +5,9 @@ import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
 import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
+import io.dropwizard.hibernate.UnitOfWork;
 
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -33,6 +35,8 @@ public class FirmaDigitalResource {
         this.principalProvider = principalProvider;
     }
 
+    @POST
+    @UnitOfWork
     public Response crearFirmaDigital(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         if (coincideUsuarioConLaInformacion(informacionFirma)) {
             DocumentoFirmado documentoFirmado = servicioFirmaDigital.firmar(informacionFirma);

@@ -83,7 +83,7 @@ public class FirmaDigitalResourceTest {
 
     @Test
     public void debeRetornar400ProhibidoSiElNombreDeUsuarioNoCoincideConElDeLaInformacion() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
-        informacionFirma.setNombreUsuario(randomAlphabetic(10));
+        informacionFirma = new InformacionFirma(randomAlphabetic(10), randomAlphabetic(10), randomAlphabetic(10));
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getStatus(), is(HttpStatus.BAD_REQUEST_400));
     }

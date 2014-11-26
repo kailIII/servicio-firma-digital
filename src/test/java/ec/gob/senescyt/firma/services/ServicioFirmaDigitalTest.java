@@ -12,13 +12,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Base64;
 import java.util.Optional;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
@@ -69,7 +69,7 @@ public class ServicioFirmaDigitalTest {
         servicio.firmar(informacionFirma);
         ArgumentCaptor<DocumentoFirmado> capturador = ArgumentCaptor.forClass(DocumentoFirmado.class);
         verify(documentoFirmadoDAO, times(1)).guardar(capturador.capture());
-        assertThat(capturador.getValue().getFirmaDigital(), is(new String(firmaEsperada, Charset.forName("UTF-8"))));
+        assertThat(capturador.getValue().getFirmaDigital(), is(Base64.getEncoder().encodeToString(firmaEsperada)));
     }
 
     @Test

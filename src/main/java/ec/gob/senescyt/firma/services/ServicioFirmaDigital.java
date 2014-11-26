@@ -8,13 +8,13 @@ import ec.gob.senescyt.firma.security.FirmaDigital;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Base64;
 
 public class ServicioFirmaDigital {
     private final FirmaDigital firmaDigital;
@@ -36,7 +36,7 @@ public class ServicioFirmaDigital {
                                                        configuracionFirma.getCaminoArchivo(),
                                                        informacionFirma.getContrasenia());
 
-        String resultadoFirmaDigital = new String(firmaDigital, Charset.forName("UTF-8"));
+        String resultadoFirmaDigital = Base64.getEncoder().encodeToString(firmaDigital);
         DocumentoFirmado documentoFirmado = new DocumentoFirmado(resultadoFirmaDigital, configuracionFirma);
         return documentoFirmadoDAO.guardar(documentoFirmado);
     }
