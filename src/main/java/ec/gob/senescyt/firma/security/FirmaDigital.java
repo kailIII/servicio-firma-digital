@@ -28,4 +28,14 @@ public class FirmaDigital {
         signature.update(cadenaAFirmar.getBytes(Charset.forName("UTF-8")));
         return signature.sign();
     }
+
+    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        try {
+            PrivateKey privateKey = almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
+            return privateKey != null;
+        }
+        catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException ex) {
+            return false;
+        }
+    }
 }

@@ -23,12 +23,13 @@ import java.security.cert.CertificateException;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Signature.class, FirmaDigital.class})
@@ -53,7 +54,7 @@ public class FirmaDigitalTest {
         cadenaAFirmar = randomAlphabetic(500);
         firmaDigital = new FirmaDigital(almacenLlaves);
         caminoArchivo = randomAlphabetic(10);
-        when(almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA)).thenReturn(llavePrivada);
+        PowerMockito.when(almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA)).thenReturn(llavePrivada);
     }
 
     @Test
@@ -65,7 +66,7 @@ public class FirmaDigitalTest {
     @Test
     public void debeRetornarLaFirmaAsociadaALaCadenaConLaLlavePrivada() throws SignatureException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, InvalidKeyException {
         byte[] firmaEsperada = new byte[10];
-        when(firma.sign()).thenReturn(firmaEsperada);
+        PowerMockito.when(firma.sign()).thenReturn(firmaEsperada);
         byte[] firmaActual = firmaDigital.firmar(cadenaAFirmar, caminoArchivo, CONTRASENIA);
         assertThat(firmaActual, is(firmaEsperada));
     }
@@ -77,5 +78,39 @@ public class FirmaDigitalTest {
         inOrder.verify(firma, times(1)).initSign(llavePrivada);
         inOrder.verify(firma, times(1)).update(cadenaAFirmar.getBytes(Charset.forName("UTF-8")));
         inOrder.verify(firma, times(1)).sign();
+    }
+
+    @Test
+    public void debeRetornarVerdaderoSiExisteUnaLlavePrivadaParaFirmar() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        boolean existeLlave = firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        assertThat(existeLlave, is(true));
+    }
+
+    @Test
+    public void debeRetornarFalsoCuandoNoExisteUnaLlavePrivada() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, UnrecoverableKeyException {
+        when(almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA)).thenReturn(null);
+        boolean existeLlave = firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        assertThat(existeLlave, is(false));
+    }
+
+    @Test
+    public void debeRetornarFalsoCuandoLaContraseniaNoEsValidaParaObtenerLaLLave() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, UnrecoverableKeyException {
+        doThrow(new UnrecoverableKeyException()).when(almacenLlaves).obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        boolean existeLlave = firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        assertThat(existeLlave, is(false));
+    }
+
+    @Test
+    public void debeRetornarFalsoCuandoElAlgoritmoParaRecuperarLaLlaveNoExiste() throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        doThrow(new NoSuchAlgorithmException()).when(almacenLlaves).obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        boolean existeLlave = firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        assertThat(existeLlave, is(false));
+    }
+
+    @Test
+    public void debeRetornarFalsoCuandoNoEsPosibleAccederAlAlmacenDeLlaves() throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        doThrow(new KeyStoreException()).when(almacenLlaves).obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        boolean existeLlave = firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
+        assertThat(existeLlave, is(false));
     }
 }

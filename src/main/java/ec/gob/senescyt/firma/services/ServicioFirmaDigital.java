@@ -18,7 +18,7 @@ import java.util.Base64;
 
 public class ServicioFirmaDigital {
     private final FirmaDigital firmaDigital;
-    private ConfiguracionFirmaDAO configuracionFirmaDAO;
+    private final ConfiguracionFirmaDAO configuracionFirmaDAO;
     private final DocumentoFirmadoDAO documentoFirmadoDAO;
 
     public ServicioFirmaDigital(FirmaDigital firmaDigital,
@@ -32,11 +32,11 @@ public class ServicioFirmaDigital {
     public DocumentoFirmado firmar(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
         ConfiguracionFirma configuracionFirma = configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario()).get();
 
-        byte[] firmaDigital = this.firmaDigital.firmar(informacionFirma.getTextoAFirmar(),
+        byte[] resultadoFirma = firmaDigital.firmar(informacionFirma.getTextoAFirmar(),
                                                        configuracionFirma.getCaminoArchivo(),
                                                        informacionFirma.getContrasenia());
 
-        String resultadoFirmaDigital = Base64.getEncoder().encodeToString(firmaDigital);
+        String resultadoFirmaDigital = Base64.getEncoder().encodeToString(resultadoFirma);
         DocumentoFirmado documentoFirmado = new DocumentoFirmado(resultadoFirmaDigital, configuracionFirma);
         return documentoFirmadoDAO.guardar(documentoFirmado);
     }
