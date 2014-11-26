@@ -21,6 +21,9 @@ public class ConfiguracionFirma extends EntidadBase{
     private String caminoArchivo;
     private String nombreUsuario;
 
+    private ConfiguracionFirma() {
+    }
+
     public ConfiguracionFirma(String nombreUsuario, String caminoArchivo) {
         this.nombreUsuario = nombreUsuario;
         this.caminoArchivo = caminoArchivo;
