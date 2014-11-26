@@ -2,6 +2,7 @@ package ec.gob.senescyt;
 
 import com.google.common.annotations.VisibleForTesting;
 import ec.gob.senescyt.firma.core.ConfiguracionFirma;
+import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
 import ec.gob.senescyt.firma.resources.FirmaDigitalResource;
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
 public class ServicioApplication extends MicroservicioAplicacion<MicroservicioConfiguracion> {
 
     private final HibernateBundle<MicroservicioConfiguracion> hibernate = new HibernateBundle<MicroservicioConfiguracion>(
-            ConfiguracionFirma.class) {
+            ConfiguracionFirma.class, DocumentoFirmado.class) {
         @Override
         public DataSourceFactory getDataSourceFactory(MicroservicioConfiguracion configuration) {
             return configuration.getDataSourceFactory();

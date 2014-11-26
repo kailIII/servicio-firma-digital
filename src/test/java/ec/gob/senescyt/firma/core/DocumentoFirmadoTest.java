@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang.math.RandomUtils.nextLong;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,12 +18,19 @@ public class DocumentoFirmadoTest {
     private DocumentoFirmado documentoFirmado;
     private String firmaDigital;
     private ConfiguracionFirma configuracionFirma;
+    private long idDocumentoFirmado;
 
     @Before
     public void setUp() {
         firmaDigital = randomAlphabetic(10);
         configuracionFirma = new ConfiguracionFirma(randomAlphabetic(10), randomAlphabetic(10));
-        documentoFirmado = new DocumentoFirmado(firmaDigital, configuracionFirma);
+        idDocumentoFirmado = nextLong();
+        documentoFirmado = new DocumentoFirmado(idDocumentoFirmado, firmaDigital, configuracionFirma);
+    }
+
+    @Test
+    public void debeTenerUnaIdentificacion() {
+        assertThat(documentoFirmado.getId(), is(idDocumentoFirmado));
     }
 
     @Test

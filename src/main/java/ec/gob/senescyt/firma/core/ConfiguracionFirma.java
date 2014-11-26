@@ -21,7 +21,8 @@ public class ConfiguracionFirma extends EntidadBase{
     private String caminoArchivo;
     private String nombreUsuario;
 
-    private ConfiguracionFirma() {
+    protected ConfiguracionFirma() {
+        // PMD
     }
 
     public ConfiguracionFirma(String nombreUsuario, String caminoArchivo) {
