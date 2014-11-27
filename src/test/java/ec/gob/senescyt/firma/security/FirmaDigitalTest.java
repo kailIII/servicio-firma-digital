@@ -50,7 +50,7 @@ public class FirmaDigitalTest {
         initMocks(this);
         mockStatic(Signature.class);
         firma = PowerMockito.mock(Signature.class);
-        PowerMockito.when(Signature.getInstance("SHA1withRSA")).thenReturn(firma);
+        PowerMockito.when(Signature.getInstance("SHA256withRSA")).thenReturn(firma);
         cadenaAFirmar = randomAlphabetic(500);
         firmaDigital = new FirmaDigital(almacenLlaves);
         caminoArchivo = randomAlphabetic(10);

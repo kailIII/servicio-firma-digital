@@ -13,7 +13,7 @@ import java.security.cert.CertificateException;
 
 public class FirmaDigital {
 
-    private static final String SHA_1_WITH_RSA = "SHA1withRSA";
+    private static final String SHA_1_WITH_RSA = "SHA256withRSA";
     private AlmacenLlavesProvider almacenLlaves;
     private Signature signature;
 
