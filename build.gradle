@@ -40,6 +40,7 @@ sourceSets {
 project.ext {
     dropwizardVersion = '0.7.0'
     archivoConfiguracion = 'servicio.yml'
+    generatedSources = ['ec/gob/senescyt/**/dao/**/*']
 }
 
 repositories {
@@ -171,6 +172,13 @@ compileJava {
 
 jacoco {
     toolVersion = '0.7.1.201405082137'
+    excludes = generatedSources
+}
+
+jacocoTestReport {
+    doFirst {
+        classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(generatedSources)
+    }
 }
 
 idea {
