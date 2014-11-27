@@ -32,8 +32,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Signature.class, FirmaDigital.class})
-public class FirmaDigitalTest {
+@PrepareForTest({Signature.class, FirmaDigitalImpl.class})
+public class FirmaDigitalImplTest {
 
     public static final String CONTRASENIA = randomAlphabetic(10);
     @Mock
@@ -41,7 +41,7 @@ public class FirmaDigitalTest {
     @Mock
     private PrivateKey llavePrivada;
     private Signature firma;
-    private FirmaDigital firmaDigital;
+    private FirmaDigitalImpl firmaDigital;
     private String caminoArchivo;
     private String cadenaAFirmar;
 
@@ -52,7 +52,7 @@ public class FirmaDigitalTest {
         firma = PowerMockito.mock(Signature.class);
         PowerMockito.when(Signature.getInstance("SHA256withRSA")).thenReturn(firma);
         cadenaAFirmar = randomAlphabetic(500);
-        firmaDigital = new FirmaDigital(almacenLlaves);
+        firmaDigital = new FirmaDigitalImpl(almacenLlaves);
         caminoArchivo = randomAlphabetic(10);
         PowerMockito.when(almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA)).thenReturn(llavePrivada);
     }

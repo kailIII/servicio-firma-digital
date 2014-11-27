@@ -4,7 +4,7 @@ import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
-import ec.gob.senescyt.firma.security.FirmaDigital;
+import ec.gob.senescyt.firma.security.FirmaDigitalImpl;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class ServicioFirmaDigitalTest {
 
     @Mock
-    private FirmaDigital firmaDigital;
+    private FirmaDigitalImpl firmaDigital;
     @Mock
     private DocumentoFirmadoDAO documentoFirmadoDAO;
     @Mock

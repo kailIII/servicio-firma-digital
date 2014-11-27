@@ -10,6 +10,7 @@ import ec.gob.senescyt.firma.security.AliasProvider;
 import ec.gob.senescyt.firma.security.AlmacenLlavesPkcs12Provider;
 import ec.gob.senescyt.firma.security.AlmacenLlavesProvider;
 import ec.gob.senescyt.firma.security.FirmaDigital;
+import ec.gob.senescyt.firma.security.FirmaDigitalImpl;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
 import ec.gob.senescyt.microservicios.commons.MicroservicioAplicacion;
 import ec.gob.senescyt.microservicios.commons.MicroservicioConfiguracion;
@@ -66,7 +67,7 @@ public class ServicioApplication extends MicroservicioAplicacion<MicroservicioCo
         FirmaDigital firmaDigital = null;
         try {
             almacenLlavesProvider = new AlmacenLlavesPkcs12Provider(aliasProvider);
-            firmaDigital = new FirmaDigital(almacenLlavesProvider);
+            firmaDigital = new FirmaDigitalImpl(almacenLlavesProvider);
         } catch (KeyStoreException | NoSuchAlgorithmException e) {
             LOGGER.severe(e.getMessage());
         }
