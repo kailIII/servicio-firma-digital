@@ -4,17 +4,11 @@ import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
-import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
+import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.security.FirmaDigital;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -31,7 +25,7 @@ public class ServicioFirmaDigital {
         this.documentoFirmadoDAO = documentoFirmadoDAO;
     }
 
-    public DocumentoFirmado firmar(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
+    public DocumentoFirmado firmar(InformacionFirma informacionFirma) throws FirmaDigitalExcepcion {
         ConfiguracionFirma configuracionFirma = configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario()).get();
 
         byte[] resultadoFirma = firmaDigital.firmar(informacionFirma.getTextoAFirmar(),
@@ -43,7 +37,7 @@ public class ServicioFirmaDigital {
         return documentoFirmadoDAO.guardar(documentoFirmado);
     }
 
-    public boolean validarCredencialesFirma(String nombreUsuario, String contrasenia) throws CertificateException, IOException {
+    public boolean validarCredencialesFirma(String nombreUsuario, String contrasenia) throws AlmacenLlavesExcepcion {
         Optional<ConfiguracionFirma> configuracionFirma = configuracionFirmaDAO.obtenerPorUsuario(nombreUsuario);
         return configuracionFirma.isPresent() &&
                firmaDigital.existeLlavePrivadaParaFirmar(configuracionFirma.get().getCaminoArchivo(), contrasenia);

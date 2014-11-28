@@ -1,15 +1,14 @@
 package ec.gob.senescyt.firma.security;
 
-import java.io.IOException;
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
+import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
+
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 
 public class FirmaDigitalImpl implements FirmaDigital {
 
@@ -22,19 +21,22 @@ public class FirmaDigitalImpl implements FirmaDigital {
         signature = Signature.getInstance(SHA_1_WITH_RSA);
     }
 
-    public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws IOException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException {
-        PrivateKey privateKey = almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
-        signature.initSign(privateKey);
-        signature.update(cadenaAFirmar.getBytes(Charset.forName("UTF-8")));
-        return signature.sign();
+    public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws FirmaDigitalExcepcion {
+        try {
+            PrivateKey privateKey = almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
+            signature.initSign(privateKey);
+            signature.update(cadenaAFirmar.getBytes(Charset.forName("UTF-8")));
+            return signature.sign();
+        } catch (SignatureException | AlmacenLlavesExcepcion | InvalidKeyException e) {
+            throw new FirmaDigitalExcepcion("Error al realizar la firma digital", e);
+        }
     }
 
-    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws CertificateException, IOException {
+    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) {
         try {
             PrivateKey privateKey = almacenLlaves.obtenerLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
             return privateKey != null;
-        }
-        catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException ex) {
+        } catch (AlmacenLlavesExcepcion e) {
             return false;
         }
     }

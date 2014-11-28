@@ -1,5 +1,6 @@
 package ec.gob.senescyt.firma.security;
 
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,7 +59,7 @@ public class AlmacenLlavesPkcs12ProviderTest {
 
     @Test
     public void debeCerrarElArchivoDespuesDeLaCarga()
-            throws CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyStoreException {
+            throws CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyStoreException, AlmacenLlavesExcepcion {
         proveedorAlmacen.obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
         verify(archivo, times(1)).close();
     }
@@ -69,7 +70,7 @@ public class AlmacenLlavesPkcs12ProviderTest {
         try {
             proveedorAlmacen.obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
         }
-        catch (NoSuchAlgorithmException ex) {
+        catch (AlmacenLlavesExcepcion e) {
             verify(archivo, times(1)).close();
         }
     }
@@ -83,7 +84,7 @@ public class AlmacenLlavesPkcs12ProviderTest {
     }
 
     @Test
-    public void debeRetornarLaLlavePrivadaAPartirDeUnArchivoPkcs12() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
+    public void debeRetornarLaLlavePrivadaAPartirDeUnArchivoPkcs12() throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, AlmacenLlavesExcepcion {
         Mockito.when(aliasProvider.obtenerPrimerAliasParaFirmar(almacenLlaves)).thenReturn(aliasEsperado);
         PrivateKey llavePrivadaEsperada = Mockito.mock(PrivateKey.class);
         when(almacenLlaves.getKey(aliasEsperado, CONTRASENIA.toCharArray())).thenReturn(llavePrivadaEsperada);

@@ -1,6 +1,7 @@
 package ec.gob.senescyt.firma.security;
 
-import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
+import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.security.certs.CertificadoFactory;
 import ec.gob.senescyt.firma.security.certs.CertificadosRaizFactory;
 import ec.gob.senescyt.firma.security.certs.FirmaDigitalProxyConfiguracion;
@@ -17,11 +18,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathParameters;
 import java.security.cert.CertPathValidator;
@@ -99,14 +96,14 @@ public class FirmaDigitalProxyTest {
     }
 
     @Test
-    public void debeValidarLaCadenaDeConfianzaDelCertificado() throws CertificateException, IOException, CertPathValidatorException, InvalidAlgorithmParameterException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, InvalidKeyException, SignatureException, ValidacionCertificadoExcepcion {
+    public void debeValidarLaCadenaDeConfianzaDelCertificado() throws CertificateException, FirmaDigitalExcepcion, CertPathValidatorException, InvalidAlgorithmParameterException {
         when(fabricaCertificados.generateCertPath(anyList())).thenReturn(certPath);
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
         Mockito.verify(validador, times(1)).validate(eq(certPath), any(CertPathParameters.class));
     }
 
     @Test
-    public void debeAgregarElCertificadoSubordinadoEnLaLista() throws CertificateException, IOException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, InvalidKeyException, SignatureException, CertPathValidatorException, InvalidAlgorithmParameterException, ValidacionCertificadoExcepcion {
+    public void debeAgregarElCertificadoSubordinadoEnLaLista() throws CertificateException, FirmaDigitalExcepcion, IOException {
         ArrayList<Certificate> certificados = newArrayList(certificadoSubordinado);
         when(fabricaCertificados.generateCertPath(certificados)).thenReturn(certPath);
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
@@ -114,7 +111,7 @@ public class FirmaDigitalProxyTest {
     }
 
     @Test
-    public void debeAgregarElCertificadoHijoEnLaLista() throws CertificateException, IOException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, InvalidKeyException, SignatureException, CertPathValidatorException, InvalidAlgorithmParameterException, ValidacionCertificadoExcepcion {
+    public void debeAgregarElCertificadoHijoEnLaLista() throws CertificateException, FirmaDigitalExcepcion, IOException {
         ArrayList<Certificate> certificados = newArrayList(certificadoHijo);
         when(fabricaCertificados.generateCertPath(certificados)).thenReturn(certPath);
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
@@ -122,7 +119,7 @@ public class FirmaDigitalProxyTest {
     }
 
     @Test
-    public void debeGenerarElCertPathConLosCertificadosDeLaLista() throws CertificateException, IOException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, InvalidKeyException, SignatureException, CertPathValidatorException, InvalidAlgorithmParameterException, ValidacionCertificadoExcepcion {
+    public void debeGenerarElCertPathConLosCertificadosDeLaLista() throws CertificateException, FirmaDigitalExcepcion {
         ArrayList<Certificate> certificados = newArrayList(certificadoHijo, certificadoSubordinado);
         when(fabricaCertificados.generateCertPath(certificados)).thenReturn(certPath);
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
@@ -130,14 +127,14 @@ public class FirmaDigitalProxyTest {
     }
 
     @Test
-    public void debeCrearLosParametrosDeValidacionConUnCertificadoRaizDeAnchor() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, CertPathValidatorException, InvalidAlgorithmParameterException, ValidacionCertificadoExcepcion {
+    public void debeCrearLosParametrosDeValidacionConUnCertificadoRaizDeAnchor() throws FirmaDigitalExcepcion, CertPathValidatorException, InvalidAlgorithmParameterException {
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
         Mockito.verify(validador, times(1)).validate(any(CertPath.class), capturaParametros.capture());
         assertThat(capturaParametros.getValue().getTrustAnchors().size(), is(1));
     }
 
     @Test
-    public void debeCrearElAnchorPartiendoDelCertificadoRaiz() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, CertPathValidatorException, InvalidAlgorithmParameterException, ValidacionCertificadoExcepcion {
+    public void debeCrearElAnchorPartiendoDelCertificadoRaiz() throws FirmaDigitalExcepcion, CertPathValidatorException, InvalidAlgorithmParameterException {
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
         Mockito.verify(validador, times(1)).validate(any(CertPath.class), capturaParametros.capture());
         boolean contieneCertificadoRaiz = capturaParametros.getValue().getTrustAnchors().stream().anyMatch(a -> a.getTrustedCert() == certificadoRaiz);
@@ -145,14 +142,14 @@ public class FirmaDigitalProxyTest {
     }
 
     @Test
-    public void debeVerificarQueRevocationEsteActivado() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, CertPathValidatorException, InvalidAlgorithmParameterException, ValidacionCertificadoExcepcion {
+    public void debeVerificarQueRevocationEsteActivado() throws FirmaDigitalExcepcion, CertPathValidatorException, InvalidAlgorithmParameterException {
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
         Mockito.verify(validador, times(1)).validate(any(CertPath.class), capturaParametros.capture());
         assertThat(capturaParametros.getValue().isRevocationEnabled(), is(true));
     }
 
     @Test
-    public void debeInicializarLosParametrosDeValidacionAntesDeValidarElCertificado() throws Exception, ValidacionCertificadoExcepcion {
+    public void debeInicializarLosParametrosDeValidacionAntesDeValidarElCertificado() throws FirmaDigitalExcepcion, CertPathValidatorException, InvalidAlgorithmParameterException {
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
         InOrder orderDeLLamada = inOrder(configuracion, validador);
         orderDeLLamada.verify(configuracion, times(1)).configurar();
@@ -160,7 +157,7 @@ public class FirmaDigitalProxyTest {
     }
 
     @Test
-    public void debeRetornarElResultadoDeLaFirmaSiLaValidacionEsExitosa() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
+    public void debeRetornarElResultadoDeLaFirmaSiLaValidacionEsExitosa() throws FirmaDigitalExcepcion {
         byte[] firmaEsperada = randomAlphabetic(10).getBytes(Charset.defaultCharset());
         when(firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia)).thenReturn(firmaEsperada);
         byte[] firma = firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
@@ -168,18 +165,18 @@ public class FirmaDigitalProxyTest {
     }
 
     @Test
-    public void debeLevantarUnaExcepcionSiLaValidacionFalla() throws Exception, ValidacionCertificadoExcepcion {
+    public void debeLevantarUnaExcepcionSiLaValidacionFalla() throws CertPathValidatorException, InvalidAlgorithmParameterException {
         when(validador.validate(any(), any())).thenThrow(new CertPathValidatorException());
         try {
             firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
         }
-        catch (ValidacionCertificadoExcepcion excepcion) {
+        catch (FirmaDigitalExcepcion excepcion) {
             assertThat(excepcion.getMessage(), is(ERROR_DE_VALIDACIÓN_DEL_CERTIFICADO));
         }
     }
 
     @Test
-    public void debeLlamarAlMetodoRealDeValidacionDeLaFirma() throws CertificateException, IOException {
+    public void debeLlamarAlMetodoRealDeValidacionDeLaFirma() throws AlmacenLlavesExcepcion {
         firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
         verify(firmaDigitalReal, times(1)).existeLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
     }

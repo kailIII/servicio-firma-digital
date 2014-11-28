@@ -1,5 +1,7 @@
 package ec.gob.senescyt.firma.security;
 
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,15 +17,23 @@ public class AlmacenLlavesPkcs12Provider implements AlmacenLlavesProvider {
     private KeyStore almacenLlaves;
     private AliasProvider aliasProvider;
 
-    public AlmacenLlavesPkcs12Provider(AliasProvider aliasProvider) throws KeyStoreException {
+    public AlmacenLlavesPkcs12Provider(AliasProvider aliasProvider) throws AlmacenLlavesExcepcion {
         this.aliasProvider = aliasProvider;
-        this.almacenLlaves = KeyStore.getInstance(ALMACEN_PKCS12);
+        try {
+            this.almacenLlaves = KeyStore.getInstance(ALMACEN_PKCS12);
+        } catch (KeyStoreException e) {
+            throw new AlmacenLlavesExcepcion("Error al obtener el almacen de llaves", e);
+        }
     }
 
-    public PrivateKey obtenerLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
-        cargarArchivosDeFirma(caminoArchivo, contrasenia);
-        String aliasParaFirmar = aliasProvider.obtenerPrimerAliasParaFirmar(almacenLlaves);
-        return (PrivateKey) almacenLlaves.getKey(aliasParaFirmar, contrasenia.toCharArray());
+    public PrivateKey obtenerLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws AlmacenLlavesExcepcion {
+        try {
+            cargarArchivosDeFirma(caminoArchivo, contrasenia);
+            String aliasParaFirmar = aliasProvider.obtenerPrimerAliasParaFirmar(almacenLlaves);
+            return (PrivateKey) almacenLlaves.getKey(aliasParaFirmar, contrasenia.toCharArray());
+        } catch (IOException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException | KeyStoreException e) {
+            throw new AlmacenLlavesExcepcion("Error al obtener la llave privada para firmar", e);
+        }
     }
 
     private void cargarArchivosDeFirma(String caminoArchivo, String contrasenia) throws IOException, NoSuchAlgorithmException, CertificateException {

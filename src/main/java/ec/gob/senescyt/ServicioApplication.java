@@ -5,6 +5,7 @@ import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import ec.gob.senescyt.firma.resources.FirmaDigitalResource;
 import ec.gob.senescyt.firma.security.AliasProvider;
 import ec.gob.senescyt.firma.security.AlmacenLlavesPkcs12Provider;
@@ -23,8 +24,8 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.hibernate.SessionFactory;
 
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServicioApplication extends MicroservicioAplicacion<MicroservicioConfiguracion> {
@@ -68,8 +69,8 @@ public class ServicioApplication extends MicroservicioAplicacion<MicroservicioCo
         try {
             almacenLlavesProvider = new AlmacenLlavesPkcs12Provider(aliasProvider);
             firmaDigital = new FirmaDigitalImpl(almacenLlavesProvider);
-        } catch (KeyStoreException | NoSuchAlgorithmException e) {
-            LOGGER.severe(e.getMessage());
+        } catch (AlmacenLlavesExcepcion | NoSuchAlgorithmException e) {
+            LOGGER.log(Level.FINEST, "Error al cerar el almacen de llaves y la firma digital", e);
         }
         ConfiguracionFirmaDAO configuracionFirmaDAO = new ConfiguracionFirmaDAO(getSessionFactory(), defaultSchema);
         DocumentoFirmadoDAO documentoFirmadoDAO = new DocumentoFirmadoDAO(getSessionFactory(), defaultSchema);

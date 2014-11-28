@@ -1,5 +1,7 @@
 package ec.gob.senescyt.firma.security;
 
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
+import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
 import ec.gob.senescyt.firma.security.certs.CertificadoFactory;
 import ec.gob.senescyt.firma.security.certs.CertificadosRaizFactory;
@@ -7,11 +9,7 @@ import ec.gob.senescyt.firma.security.certs.FirmaDigitalProxyConfiguracion;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
@@ -45,28 +43,36 @@ public class FirmaDigitalProxy implements FirmaDigital {
     }
 
     @Override
-    public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws IOException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
-        validarCertificadoDigital(caminoArchivo);
+    public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws FirmaDigitalExcepcion {
+        try {
+            validarCertificadoDigital(caminoArchivo);
+        } catch (IOException | CertificateException | InvalidAlgorithmParameterException | CertPathValidatorException e) {
+            throw new ValidacionCertificadoExcepcion("Error de validación del certificado", e);
+        }
         return firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
     }
 
     @Override
-    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws CertificateException, IOException {
+    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws AlmacenLlavesExcepcion {
         return firmaDigitalReal.existeLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
     }
 
-    private void validarCertificadoDigital(String caminoArchivo) throws IOException, CertificateException, ValidacionCertificadoExcepcion {
-        X509Certificate certificadoRaiz = certificadosRaizFactory.obtenerCertificadoRaiz(BCE_RAIZ);
+    private void validarCertificadoDigital(String caminoArchivo) throws IOException, CertificateException, InvalidAlgorithmParameterException, CertPathValidatorException {
+        CertPath certificadosParaValidar = generarCertPath(caminoArchivo);
+        TrustAnchor anchorRaiz = generarAnchor();
+        PKIXParameters parametros = new PKIXParameters(newHashSet(anchorRaiz));
+        configuracion.configurar();
+        validadorCertificados.validate(certificadosParaValidar, parametros);
+    }
+
+    private CertPath generarCertPath(String caminoArchivo) throws IOException, CertificateException {
         X509Certificate certificadoSubordinado = certificadosRaizFactory.obtenerCertificadoRaiz(BCE_SUBORDINADO);
         X509Certificate certificadoHijo = certificadoFactory.obtenerCertificado(caminoArchivo);
-        CertPath certificadosParaValidar = fabricaCertificados.generateCertPath(newArrayList(certificadoHijo, certificadoSubordinado));
-        TrustAnchor anchorRaiz = new TrustAnchor(certificadoRaiz, null);
-        try {
-            PKIXParameters parametros = new PKIXParameters(newHashSet(anchorRaiz));
-            configuracion.configurar();
-            validadorCertificados.validate(certificadosParaValidar, parametros);
-        } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
-            throw new ValidacionCertificadoExcepcion("Error de validación del certificado", e);
-        }
+        return fabricaCertificados.generateCertPath(newArrayList(certificadoHijo, certificadoSubordinado));
+    }
+
+    private TrustAnchor generarAnchor() throws IOException, CertificateException {
+        X509Certificate certificadoRaiz = certificadosRaizFactory.obtenerCertificadoRaiz(BCE_RAIZ);
+        return new TrustAnchor(certificadoRaiz, null);
     }
 }

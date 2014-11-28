@@ -1,7 +1,8 @@
 package ec.gob.senescyt.firma.resources;
 
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
-import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
+import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
@@ -13,13 +14,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 
 import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
 import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
@@ -40,7 +34,7 @@ public class FirmaDigitalResource {
 
     @POST
     @UnitOfWork
-    public Response crearFirmaDigital(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
+    public Response crearFirmaDigital(InformacionFirma informacionFirma) throws FirmaDigitalExcepcion {
         if (coincideUsuarioConLaInformacion(informacionFirma)) {
             DocumentoFirmado documentoFirmado = servicioFirmaDigital.firmar(informacionFirma);
             return Response.status(CREATED_201).entity(documentoFirmado).build();
@@ -56,7 +50,7 @@ public class FirmaDigitalResource {
     @POST
     @Path("credenciales/validar")
     @UnitOfWork
-    public Response validarCredenciales(String contrasenia) throws CertificateException, IOException {
+    public Response validarCredenciales(String contrasenia) throws AlmacenLlavesExcepcion {
         boolean sonCredencialesValidas = servicioFirmaDigital.validarCredencialesFirma(
                 principalProvider.obtenerUsuario().getNombreUsuario(), contrasenia);
         int codigoRespuesta = sonCredencialesValidas ? OK_200 : NOT_FOUND_404;

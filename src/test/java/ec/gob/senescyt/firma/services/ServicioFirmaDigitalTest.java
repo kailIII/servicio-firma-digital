@@ -4,7 +4,8 @@ import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
-import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
+import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
+import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.security.FirmaDigitalImpl;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import org.junit.Before;
@@ -13,11 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.UnrecoverableKeyException;
+import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateException;
 import java.util.Base64;
 import java.util.Optional;
@@ -50,7 +47,7 @@ public class ServicioFirmaDigitalTest {
     private String contrasenia;
 
     @Before
-    public void setUp() throws IOException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void setUp() throws UnsupportedEncodingException, FirmaDigitalExcepcion {
         initMocks(this);
         String textoAFirmar = randomAlphabetic(300);
         nombreUsuario = randomAlphabetic(10);
@@ -64,14 +61,14 @@ public class ServicioFirmaDigitalTest {
     }
 
     @Test
-    public void debeRetornarElDocumentoFirmadoGuardadoDadaLaInformacionDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
+    public void debeRetornarElDocumentoFirmadoGuardadoDadaLaInformacionDeFirma() throws FirmaDigitalExcepcion {
         when(documentoFirmadoDAO.guardar(any(DocumentoFirmado.class))).thenReturn(documentoFirmado);
         DocumentoFirmado documentoActual = servicio.firmar(informacionFirma);
         assertThat(documentoActual, is(documentoFirmado));
     }
 
     @Test
-    public void debeContenerElResultadoDeLaFirmaDigitalAlGuardar() throws IOException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
+    public void debeContenerElResultadoDeLaFirmaDigitalAlGuardar() throws FirmaDigitalExcepcion {
         servicio.firmar(informacionFirma);
         ArgumentCaptor<DocumentoFirmado> capturador = ArgumentCaptor.forClass(DocumentoFirmado.class);
         verify(documentoFirmadoDAO, times(1)).guardar(capturador.capture());
@@ -79,7 +76,7 @@ public class ServicioFirmaDigitalTest {
     }
 
     @Test
-    public void debeContenerLaConfiguracionConLaQueSeRealizaLaFirmaAlGuardar() throws IOException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
+    public void debeContenerLaConfiguracionConLaQueSeRealizaLaFirmaAlGuardar() throws FirmaDigitalExcepcion {
         servicio.firmar(informacionFirma);
         ArgumentCaptor<DocumentoFirmado> capturador = ArgumentCaptor.forClass(DocumentoFirmado.class);
         verify(documentoFirmadoDAO, times(1)).guardar(capturador.capture());
@@ -87,21 +84,21 @@ public class ServicioFirmaDigitalTest {
     }
 
     @Test
-    public void debeRetornarVerdaderoSiLasCredencialesNoSonValidasParaFirmar() throws CertificateException, IOException {
+    public void debeRetornarVerdaderoSiLasCredencialesNoSonValidasParaFirmar() throws AlmacenLlavesExcepcion {
         when(firmaDigital.existeLlavePrivadaParaFirmar(configuracionFirma.getCaminoArchivo(), contrasenia)).thenReturn(true);
         boolean sonValidas = servicio.validarCredencialesFirma(nombreUsuario, contrasenia);
         assertThat(sonValidas, is(true));
     }
 
     @Test
-    public void debeRetornarFalsoSiLasCredencialesNoSonValidasParaFirmar() throws CertificateException, IOException {
+    public void debeRetornarFalsoSiLasCredencialesNoSonValidasParaFirmar() throws CertificateException, IOException, AlmacenLlavesExcepcion {
         when(firmaDigital.existeLlavePrivadaParaFirmar(configuracionFirma.getCaminoArchivo(), contrasenia)).thenReturn(false);
         boolean sonValidas = servicio.validarCredencialesFirma(nombreUsuario, contrasenia);
         assertThat(sonValidas, is(false));
     }
 
     @Test
-    public void debeRetornarFalsoSiNoExisteConfiguracionParaElUsuario() throws CertificateException, IOException {
+    public void debeRetornarFalsoSiNoExisteConfiguracionParaElUsuario() throws CertificateException, IOException, AlmacenLlavesExcepcion {
         when(configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario())).thenReturn(Optional.empty());
         boolean sonValidas = servicio.validarCredencialesFirma(nombreUsuario, contrasenia);
         assertThat(sonValidas, is(false));
