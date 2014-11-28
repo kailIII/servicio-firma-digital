@@ -56,7 +56,7 @@ public class FirmaDigitalProxy implements FirmaDigital {
             configuracion.configurar();
             validadorCertificados.validate(certificadosParaValidar, parametros);
         } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
-            throw new ValidacionCertificadoExcepcion("", e);
+            throw new ValidacionCertificadoExcepcion("Error de validación del certificado", e);
         }
         return firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
     }

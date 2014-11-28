@@ -5,9 +5,7 @@ import ec.gob.senescyt.firma.security.certs.CertificadoFactory;
 import ec.gob.senescyt.firma.security.certs.CertificadosRaizFactory;
 import ec.gob.senescyt.firma.security.certs.FirmaDigitalProxyConfiguracion;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
@@ -39,14 +37,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import static ec.gob.senescyt.firma.security.certs.TiposCertificadosRaiz.BCE_RAIZ;
 import static ec.gob.senescyt.firma.security.certs.TiposCertificadosRaiz.BCE_SUBORDINADO;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -56,6 +53,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PrepareForTest({ CertPathValidator.class, CertificateFactory.class, FirmaDigitalProxy.class })
 public class FirmaDigitalProxyTest {
 
+    private static final String ERROR_DE_VALIDACIÓN_DEL_CERTIFICADO = "Error de validación del certificado";
     private CertPathValidator validador;
     private CertificateFactory fabricaCertificados;
     private FirmaDigital firmaDigital;
@@ -72,8 +70,6 @@ public class FirmaDigitalProxyTest {
     private final ArgumentCaptor<PKIXParameters> capturaParametros = ArgumentCaptor.forClass(PKIXParameters.class);
     @Mock
     private FirmaDigital firmaDigitalReal;
-    @Rule
-    public ExpectedException excepcion = ExpectedException.none();
 
 
     @Before
@@ -172,10 +168,12 @@ public class FirmaDigitalProxyTest {
 
     @Test
     public void debeLevantarUnaExcepcionSiLaValidacionFalla() throws Exception, ValidacionCertificadoExcepcion {
-        excepcion.expect(ValidacionCertificadoExcepcion.class);
         when(validador.validate(any(), any())).thenThrow(new CertPathValidatorException());
-        firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
-        excepcion.expectMessage("Error de validación del certificado");
-        verifyZeroInteractions(firmaDigitalReal);
+        try {
+            firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
+        }
+        catch (ValidacionCertificadoExcepcion excepcion) {
+            assertThat(excepcion.getMessage(), is(ERROR_DE_VALIDACIÓN_DEL_CERTIFICADO));
+        }
     }
 }
