@@ -14,8 +14,8 @@ project.ext {
 }
 
 task expandirConfig(type: Copy) {
-    def hostBaseDeDatos = obtenerValorDesdeVariableDeEntorno("null", "localhost")
-    def clave = obtenerValorDesdeVariableDeEntorno("null", "sniese")
+    def hostBaseDeDatos = obtenerValorDesdeVariableDeEntorno("$System.env.IP_BASE_DATOS_PREPRO", "localhost")
+    def clave = obtenerValorDesdeVariableDeEntorno("$System.env.CLAVE_SNIESE_KEY_STORE", "sniese")
 
     from('.')
     include('**/*.yml.template')
