@@ -4,6 +4,7 @@ import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
+import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
 import ec.gob.senescyt.firma.security.FirmaDigitalImpl;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import org.junit.Before;
@@ -63,14 +64,14 @@ public class ServicioFirmaDigitalTest {
     }
 
     @Test
-    public void debeRetornarElDocumentoFirmadoGuardadoDadaLaInformacionDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void debeRetornarElDocumentoFirmadoGuardadoDadaLaInformacionDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         when(documentoFirmadoDAO.guardar(any(DocumentoFirmado.class))).thenReturn(documentoFirmado);
         DocumentoFirmado documentoActual = servicio.firmar(informacionFirma);
         assertThat(documentoActual, is(documentoFirmado));
     }
 
     @Test
-    public void debeContenerElResultadoDeLaFirmaDigitalAlGuardar() throws IOException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void debeContenerElResultadoDeLaFirmaDigitalAlGuardar() throws IOException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         servicio.firmar(informacionFirma);
         ArgumentCaptor<DocumentoFirmado> capturador = ArgumentCaptor.forClass(DocumentoFirmado.class);
         verify(documentoFirmadoDAO, times(1)).guardar(capturador.capture());
@@ -78,7 +79,7 @@ public class ServicioFirmaDigitalTest {
     }
 
     @Test
-    public void debeContenerLaConfiguracionConLaQueSeRealizaLaFirmaAlGuardar() throws IOException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void debeContenerLaConfiguracionConLaQueSeRealizaLaFirmaAlGuardar() throws IOException, CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         servicio.firmar(informacionFirma);
         ArgumentCaptor<DocumentoFirmado> capturador = ArgumentCaptor.forClass(DocumentoFirmado.class);
         verify(documentoFirmadoDAO, times(1)).guardar(capturador.capture());

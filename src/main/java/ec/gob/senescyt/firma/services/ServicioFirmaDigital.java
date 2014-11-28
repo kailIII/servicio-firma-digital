@@ -4,6 +4,7 @@ import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
+import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
 import ec.gob.senescyt.firma.security.FirmaDigital;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 
@@ -30,7 +31,7 @@ public class ServicioFirmaDigital {
         this.documentoFirmadoDAO = documentoFirmadoDAO;
     }
 
-    public DocumentoFirmado firmar(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public DocumentoFirmado firmar(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         ConfiguracionFirma configuracionFirma = configuracionFirmaDAO.obtenerPorUsuario(informacionFirma.getNombreUsuario()).get();
 
         byte[] resultadoFirma = firmaDigital.firmar(informacionFirma.getTextoAFirmar(),

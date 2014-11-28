@@ -1,6 +1,7 @@
 package ec.gob.senescyt.firma.resources;
 
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
+import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
@@ -39,7 +40,7 @@ public class FirmaDigitalResource {
 
     @POST
     @UnitOfWork
-    public Response crearFirmaDigital(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public Response crearFirmaDigital(InformacionFirma informacionFirma) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         if (coincideUsuarioConLaInformacion(informacionFirma)) {
             DocumentoFirmado documentoFirmado = servicioFirmaDigital.firmar(informacionFirma);
             return Response.status(CREATED_201).entity(documentoFirmado).build();

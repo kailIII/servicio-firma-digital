@@ -1,7 +1,9 @@
 package ec.gob.senescyt.firma.security;
 
+import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
 import ec.gob.senescyt.firma.security.certs.CertificadoFactory;
 import ec.gob.senescyt.firma.security.certs.CertificadosRaizFactory;
+import ec.gob.senescyt.firma.security.certs.FirmaDigitalProxyConfiguracion;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -15,34 +17,48 @@ import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXParameters;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
+import static ec.gob.senescyt.firma.security.certs.TiposCertificadosRaiz.BCE_RAIZ;
 import static ec.gob.senescyt.firma.security.certs.TiposCertificadosRaiz.BCE_SUBORDINADO;
 
 public class FirmaDigitalProxy implements FirmaDigital {
 
+    private FirmaDigital firmaDigitalReal;
     private CertificadosRaizFactory certificadosRaizFactory;
     private CertificadoFactory certificadoFactory;
+    private FirmaDigitalProxyConfiguracion configuracion;
+    private final CertificateFactory fabricaCertificados;
+    private final CertPathValidator validadorCertificados;
 
-    public FirmaDigitalProxy(CertificadosRaizFactory certificadosRaizFactory, CertificadoFactory certificadoFactory) {
+    public FirmaDigitalProxy(FirmaDigital firmaDigitalReal, CertificadosRaizFactory certificadosRaizFactory, CertificadoFactory certificadoFactory, FirmaDigitalProxyConfiguracion configuracion) throws CertificateException, NoSuchAlgorithmException {
+        this.firmaDigitalReal = firmaDigitalReal;
         this.certificadosRaizFactory = certificadosRaizFactory;
         this.certificadoFactory = certificadoFactory;
+        this.configuracion = configuracion;
+        fabricaCertificados = CertificateFactory.getInstance("X.509");
+        validadorCertificados = CertPathValidator.getInstance("PKIX");
     }
 
     @Override
-    public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws IOException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException {
+    public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws IOException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
+        X509Certificate certificadoRaiz = certificadosRaizFactory.obtenerCertificadoRaiz(BCE_RAIZ);
         X509Certificate certificadoSubordinado = certificadosRaizFactory.obtenerCertificadoRaiz(BCE_SUBORDINADO);
         X509Certificate certificadoHijo = certificadoFactory.obtenerCertificado(caminoArchivo);
-        CertificateFactory fabrica = CertificateFactory.getInstance("X.509");
-        CertPath certificadosParaValidar = fabrica.generateCertPath(newArrayList(certificadoHijo, certificadoSubordinado));
-        CertPathValidator validador = CertPathValidator.getInstance("PKIX");
+        CertPath certificadosParaValidar = fabricaCertificados.generateCertPath(newArrayList(certificadoHijo, certificadoSubordinado));
+        TrustAnchor anchorRaiz = new TrustAnchor(certificadoRaiz, null);
         try {
-            validador.validate(certificadosParaValidar, null);
+            PKIXParameters parametros = new PKIXParameters(newHashSet(anchorRaiz));
+            configuracion.configurar();
+            validadorCertificados.validate(certificadosParaValidar, parametros);
         } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
-            throw new UnsupportedOperationException(e.getMessage(), e);
+            throw new ValidacionCertificadoExcepcion("", e);
         }
-        return new byte[0];
+        return firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
     }
 
     @Override

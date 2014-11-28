@@ -1,6 +1,7 @@
 package ec.gob.senescyt.firma.resources;
 
 import ec.gob.senescyt.firma.core.DocumentoFirmado;
+import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
@@ -49,7 +50,7 @@ public class FirmaDigitalResourceTest {
     private String contrasenia;
 
     @Before
-    public void setUp() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void setUp() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         initMocks(this);
         recurso = new FirmaDigitalResource(servicioFirmaDigital, principalProvider);
         usuario = new UsuarioAutenticado(randomAlphabetic(10), randomAlphabetic(10));
@@ -60,25 +61,25 @@ public class FirmaDigitalResourceTest {
     }
 
     @Test
-    public void debeRetornar201CreadorCuandoRecibeUnaSolicitudDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void debeRetornar201CreadorCuandoRecibeUnaSolicitudDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getStatus(), is(CREATED_201));
     }
 
     @Test
-    public void debeRetornarDocumentoFirmadoCuandoRecibeUnaSolicitudDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void debeRetornarDocumentoFirmadoCuandoRecibeUnaSolicitudDeFirma() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getEntity(), instanceOf(DocumentoFirmado.class));
     }
 
     @Test
-    public void debeRetornarLaInstanciaDelDocumentoFirmado() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void debeRetornarLaInstanciaDelDocumentoFirmado() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getEntity(), is(documentoFirmado));
     }
 
     @Test
-    public void debeAsignarElNombreDeUsuarioALaInformacionDeFirmaAntesDeEnviarAFirmar() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void debeAsignarElNombreDeUsuarioALaInformacionDeFirmaAntesDeEnviarAFirmar() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         recurso.crearFirmaDigital(informacionFirma);
         ArgumentCaptor<InformacionFirma> capturador = ArgumentCaptor.forClass(InformacionFirma.class);
         verify(servicioFirmaDigital, times(1)).firmar(capturador.capture());
@@ -86,7 +87,7 @@ public class FirmaDigitalResourceTest {
     }
 
     @Test
-    public void debeRetornar400ProhibidoSiElNombreDeUsuarioNoCoincideConElDeLaInformacion() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException {
+    public void debeRetornar400ProhibidoSiElNombreDeUsuarioNoCoincideConElDeLaInformacion() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, IOException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
         informacionFirma = new InformacionFirma(randomAlphabetic(10), randomAlphabetic(10), randomAlphabetic(10));
         Response respuesta = recurso.crearFirmaDigital(informacionFirma);
         assertThat(respuesta.getStatus(), is(HttpStatus.BAD_REQUEST_400));
