@@ -39,8 +39,8 @@ public class FirmaDigitalProxy implements FirmaDigital {
         CertPathValidator validador = CertPathValidator.getInstance("PKIX");
         try {
             validador.validate(certificadosParaValidar, null);
-        } catch (CertPathValidatorException e) {
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
+            throw new UnsupportedOperationException(e.getMessage(), e);
         }
         return new byte[0];
     }
