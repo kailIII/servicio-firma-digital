@@ -44,6 +44,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -175,5 +176,11 @@ public class FirmaDigitalProxyTest {
         catch (ValidacionCertificadoExcepcion excepcion) {
             assertThat(excepcion.getMessage(), is(ERROR_DE_VALIDACIÓN_DEL_CERTIFICADO));
         }
+    }
+
+    @Test
+    public void debeLlamarAlMetodoRealDeValidacionDeLaFirma() throws CertificateException, IOException {
+        firmaDigital.existeLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
+        verify(firmaDigitalReal, times(1)).existeLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
     }
 }

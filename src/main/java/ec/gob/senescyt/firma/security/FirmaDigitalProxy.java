@@ -46,6 +46,16 @@ public class FirmaDigitalProxy implements FirmaDigital {
 
     @Override
     public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws IOException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, SignatureException, InvalidKeyException, ValidacionCertificadoExcepcion {
+        validarCertificadoDigital(caminoArchivo);
+        return firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
+    }
+
+    @Override
+    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws CertificateException, IOException {
+        return firmaDigitalReal.existeLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
+    }
+
+    private void validarCertificadoDigital(String caminoArchivo) throws IOException, CertificateException, ValidacionCertificadoExcepcion {
         X509Certificate certificadoRaiz = certificadosRaizFactory.obtenerCertificadoRaiz(BCE_RAIZ);
         X509Certificate certificadoSubordinado = certificadosRaizFactory.obtenerCertificadoRaiz(BCE_SUBORDINADO);
         X509Certificate certificadoHijo = certificadoFactory.obtenerCertificado(caminoArchivo);
@@ -58,11 +68,5 @@ public class FirmaDigitalProxy implements FirmaDigital {
         } catch (CertPathValidatorException | InvalidAlgorithmParameterException e) {
             throw new ValidacionCertificadoExcepcion("Error de validación del certificado", e);
         }
-        return firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
-    }
-
-    @Override
-    public boolean existeLlavePrivadaParaFirmar(String caminoArchivo, String contrasenia) throws CertificateException, IOException {
-        return false;
     }
 }
