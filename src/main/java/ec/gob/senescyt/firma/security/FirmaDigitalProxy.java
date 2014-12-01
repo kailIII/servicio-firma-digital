@@ -47,7 +47,7 @@ public class FirmaDigitalProxy implements FirmaDigital {
         try {
             validarCertificadoDigital(caminoArchivo);
         } catch (IOException | CertificateException | InvalidAlgorithmParameterException | CertPathValidatorException e) {
-            throw new ValidacionCertificadoExcepcion("Error de validación del certificado", e);
+            throw new ValidacionCertificadoExcepcion(e);
         }
         return firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
     }
