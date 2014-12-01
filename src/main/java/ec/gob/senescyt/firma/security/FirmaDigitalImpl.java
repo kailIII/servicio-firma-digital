@@ -28,7 +28,7 @@ public class FirmaDigitalImpl implements FirmaDigital {
             signature.update(cadenaAFirmar.getBytes(Charset.forName("UTF-8")));
             return signature.sign();
         } catch (SignatureException | AlmacenLlavesExcepcion | InvalidKeyException e) {
-            throw new FirmaDigitalExcepcion("Error al realizar la firma digital", e);
+            throw new FirmaDigitalExcepcion(e);
         }
     }
 
