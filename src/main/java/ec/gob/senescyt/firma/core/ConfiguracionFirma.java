@@ -15,7 +15,6 @@ public class ConfiguracionFirma extends EntidadBase{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @SuppressWarnings("PMD.UnusedPrivateField")
     private long id;
 
     private String caminoArchivo;
@@ -48,5 +47,9 @@ public class ConfiguracionFirma extends EntidadBase{
 
     public boolean isActiva() {
         return activa;
+    }
+
+    public long getId() {
+        return id;
     }
 }

@@ -6,6 +6,7 @@ import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
+import ec.gob.senescyt.firma.exceptions.mappers.FirmaDigitalExcepcionGeneralExceptionMapper;
 import ec.gob.senescyt.firma.resources.FirmaDigitalResource;
 import ec.gob.senescyt.firma.security.AliasProvider;
 import ec.gob.senescyt.firma.security.AlmacenLlavesPkcs12Provider;
@@ -60,6 +61,7 @@ public class ServicioApplication extends MicroservicioAplicacion<MicroservicioCo
         JerseyEnvironment jerseyEnvironment = environment.jersey();
         this.defaultSchema = servicioConfiguration.getDefaultSchema();
         configurarRecursoFirmaDigital(jerseyEnvironment);
+        jerseyEnvironment.register(new FirmaDigitalExcepcionGeneralExceptionMapper());
     }
 
     private void configurarRecursoFirmaDigital(JerseyEnvironment jerseyEnvironment) {

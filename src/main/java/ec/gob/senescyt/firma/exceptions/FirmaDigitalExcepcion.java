@@ -1,6 +1,6 @@
 package ec.gob.senescyt.firma.exceptions;
 
-public class FirmaDigitalExcepcion extends Exception {
+public class FirmaDigitalExcepcion extends FirmaDigitalExcepcionGeneral {
 
     private static final String ERROR_AL_REALIZAR_LA_FIRMA_DIGITAL = "Error al realizar la firma digital";
 
