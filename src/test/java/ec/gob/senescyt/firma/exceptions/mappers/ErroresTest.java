@@ -23,7 +23,7 @@ public class ErroresTest extends SerializacionBaseTest {
 
     @Test
     public void debeDebeTenerUnTextoDeErrores() {
-        assertThat(errores.getErrores(), is(mensajeError));
+        assertThat(errores.getErrors(), is(mensajeError));
     }
 
     @Test

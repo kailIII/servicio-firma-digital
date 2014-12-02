@@ -73,7 +73,7 @@ public class FirmaDigitalResourceIntTest extends RecursoSeguroIntegracionTest {
         InformacionFirma informacionFirma = new InformacionFirma(randomAlphabetic(600), nombreUsuario, CONTRASENIA);
         ClientResponse respuesta = hacerPost("firmaDigital", informacionFirma);
         assertThat(respuesta.getStatus(), is(INTERNAL_SERVER_ERROR_500));
-        assertThat(respuesta.getEntity(Errores.class).getErrores(), is(notNullValue()));
+        assertThat(respuesta.getEntity(Errores.class).getErrors(), is(notNullValue()));
     }
 
     @Test

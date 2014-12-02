@@ -45,6 +45,6 @@ public class FirmaDigitalExcepcionGeneralExceptionMapperTest {
     public void debeRetornarElMensajeAmigableComoParteDelContenido() {
         Response respuesta = capturadorExcepcion.toResponse(excepcionGeneral);
         Errores errores = (Errores) respuesta.getEntity();
-        assertThat(errores.getErrores(), is(mensaje));
+        assertThat(errores.getErrors(), is(mensaje));
     }
 }

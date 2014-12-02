@@ -4,17 +4,17 @@ package ec.gob.senescyt.firma.exceptions.mappers;
 import ec.gob.senescyt.microservicios.commons.core.EntidadBase;
 
 public class Errores extends EntidadBase {
-    private String errores;
+    private String errors;
 
     protected Errores() {
         // PMD
     }
 
     public Errores(String errores) {
-        this.errores = errores;
+        this.errors = errores;
     }
 
-    public String getErrores() {
-        return errores;
+    public String getErrors() {
+        return errors;
     }
 }
