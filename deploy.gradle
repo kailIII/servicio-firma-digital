@@ -26,10 +26,18 @@ task deployQA(type: SshTask) {
     description = 'Despliega el Jar a QA'
     session(remotes.snieseqa) {
         def targetDir = "/home/sniese/servicios/servicio-firma-digital/"
-        execute "mkdir -p ${targetDir}"
+        def certsDir = "${targetDir}certs/"
+        def consultaCertificado = """
+            INSERT INTO servicio_firma_digital.configuraciones_firmas (nombreUsuario, caminoArchivo)
+            SELECT 'admin', '${certsDir}test.p12' WHERE NOT EXISTS
+            (SELECT * FROM servicio_firma_digital.configuraciones_firmas WHERE nombreUsuario = 'admin');
+        """
+        execute "mkdir -p ${certsDir}"
         put 'build/libs/servicio-standalone.jar', targetDir
         put 'servicio.yml', targetDir + 'servicio.yml'
         put 'sniese.keystore', targetDir
+        put 'src/test/resources/test.p12', certsDir
+        execute "PGPASSWORD=Passw0rd psql -h localhost -d senescyt -U thoughtworks -a -c \"$consultaCertificado\""
         executeSudo "service servicio-firma-digital restart", pty: true
     }
 }
