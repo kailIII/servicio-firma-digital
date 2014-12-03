@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "documentos_firmados")
@@ -19,6 +20,9 @@ public class DocumentoFirmado extends EntidadBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Transient
+    private String textoAFirmar;
     private String firmaDigital;
 
     @JsonIgnore
@@ -30,13 +34,15 @@ public class DocumentoFirmado extends EntidadBase {
         // PMD
     }
 
-    public DocumentoFirmado(String firmaDigital, ConfiguracionFirma configuracionFirma) {
+    public DocumentoFirmado(String textoAFirmar, String firmaDigital, ConfiguracionFirma configuracionFirma) {
+        this.textoAFirmar = textoAFirmar;
         this.firmaDigital = firmaDigital;
         this.configuracionFirma = configuracionFirma;
     }
 
-    public DocumentoFirmado(long idDocumentoFirmado, String firmaDigital, ConfiguracionFirma configuracionFirma) {
+    public DocumentoFirmado(long idDocumentoFirmado, String textoAFirmar, String firmaDigital, ConfiguracionFirma configuracionFirma) {
         this.id = idDocumentoFirmado;
+        this.textoAFirmar = textoAFirmar;
         this.firmaDigital = firmaDigital;
         this.configuracionFirma = configuracionFirma;
     }
@@ -51,5 +57,9 @@ public class DocumentoFirmado extends EntidadBase {
 
     public ConfiguracionFirma getConfiguracionFirma() {
         return configuracionFirma;
+    }
+
+    public String getTextoAFirmar() {
+        return textoAFirmar;
     }
 }

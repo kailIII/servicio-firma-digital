@@ -33,7 +33,7 @@ public class ServicioFirmaDigital {
                                                        informacionFirma.getContrasenia());
 
         String resultadoFirmaDigital = Base64.getEncoder().encodeToString(resultadoFirma);
-        DocumentoFirmado documentoFirmado = new DocumentoFirmado(resultadoFirmaDigital, configuracionFirma);
+        DocumentoFirmado documentoFirmado = new DocumentoFirmado(informacionFirma.getTextoAFirmar(), resultadoFirmaDigital, configuracionFirma);
         return documentoFirmadoDAO.guardar(documentoFirmado);
     }
 

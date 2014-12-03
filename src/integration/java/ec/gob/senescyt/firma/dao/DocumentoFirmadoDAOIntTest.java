@@ -30,7 +30,7 @@ public class DocumentoFirmadoDAOIntTest extends FirmaDigitalBaseIntTest{
 
     @Test
     public void debeGuardarUnaConfiguracionDeFirma() {
-        DocumentoFirmado documentoFirmado = new DocumentoFirmado(randomAlphabetic(100), configuracionFirma);
+        DocumentoFirmado documentoFirmado = new DocumentoFirmado(randomAlphabetic(10), randomAlphabetic(100), configuracionFirma);
         documentoFirmadoDAO.guardar(documentoFirmado);
         List<DocumentoFirmado> documentosFirmados = documentoFirmadoDAO.obtenerTodos();
         assertThat(documentosFirmados, hasItem(documentoFirmado));

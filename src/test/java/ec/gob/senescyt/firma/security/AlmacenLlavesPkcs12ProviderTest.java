@@ -2,7 +2,9 @@ package ec.gob.senescyt.firma.security;
 
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -17,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.is;
@@ -35,9 +38,12 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @PrepareForTest({KeyStore.class, AlmacenLlavesPkcs12Provider.class})
 public class AlmacenLlavesPkcs12ProviderTest {
 
+    @Rule
+    public final ExpectedException excepcionEsperada = ExpectedException.none();
+
     private static final String CONTRASENIA = "Password#1";
     KeyStore almacenLlaves;
-    private AlmacenLlavesPkcs12Provider proveedorAlmacen;
+    private AlmacenLlavesProvider proveedorAlmacen;
     @Mock
     AliasProvider aliasProvider;
     @Mock
@@ -90,5 +96,26 @@ public class AlmacenLlavesPkcs12ProviderTest {
         when(almacenLlaves.getKey(aliasEsperado, CONTRASENIA.toCharArray())).thenReturn(llavePrivadaEsperada);
         PrivateKey llavePrivada = proveedorAlmacen.obtenerLlavePrivadaParaFirmar(caminoArchivo, CONTRASENIA);
         assertThat(llavePrivada, is(llavePrivadaEsperada));
+    }
+
+    @Test
+    public void debeObtenerElCertificadoAPartirDelArchivoPkcs12() throws KeyStoreException, AlmacenLlavesExcepcion {
+        Mockito.when(aliasProvider.obtenerPrimerAliasParaFirmar(almacenLlaves)).thenReturn(aliasEsperado);
+        X509Certificate certificadoEsperado = Mockito.mock(X509Certificate.class);
+        when(almacenLlaves.getCertificate(aliasEsperado)).thenReturn(certificadoEsperado);
+        X509Certificate certificadoActual = proveedorAlmacen.obtenerCertificadoDeLaFirma(caminoArchivo, CONTRASENIA);
+        assertThat(certificadoActual, is(certificadoEsperado));
+    }
+
+    @Test
+    public void debeLanzarUnaExcepcionDeTipoAlmacenDeLlavesCuandoOcurreUnError() throws KeyStoreException, AlmacenLlavesExcepcion {
+        KeyStoreException excepcionEsperada = new KeyStoreException();
+        Mockito.when(aliasProvider.obtenerPrimerAliasParaFirmar(almacenLlaves)).thenThrow(excepcionEsperada);
+        try {
+            proveedorAlmacen.obtenerCertificadoDeLaFirma(caminoArchivo, CONTRASENIA);
+        } catch (AlmacenLlavesExcepcion almacenLlavesExcepcion) {
+            assertThat(almacenLlavesExcepcion.getMessage(), is("Error obteniendo el certificado digital"));
+            assertThat(almacenLlavesExcepcion.getCause(), is(excepcionEsperada));
+        }
     }
 }

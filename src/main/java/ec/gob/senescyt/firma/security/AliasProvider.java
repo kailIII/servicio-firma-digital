@@ -7,18 +7,17 @@ import java.util.Enumeration;
 
 public class AliasProvider {
 
-    private static final String ALIAS_VACIO = null;
     private static final int POSICION_FIRMA_DIGITAL = 0;
 
     public String obtenerPrimerAliasParaFirmar(KeyStore keyStore) throws KeyStoreException {
         Enumeration<String> aliases = keyStore.aliases();
         while (aliases.hasMoreElements()) {
             String alias = validarSiAliasPermiteFirma(aliases.nextElement(), keyStore);
-            if (!alias.equals(ALIAS_VACIO)) {
+            if (alias != null) {
                 return alias;
             }
         }
-        return ALIAS_VACIO;
+        return null;
     }
 
     private String validarSiAliasPermiteFirma(String alias, KeyStore keyStore) throws KeyStoreException {
@@ -26,7 +25,7 @@ public class AliasProvider {
         if (permiteLaLLaveFirmaDigital(usosLlave)) {
             return alias;
         }
-        return ALIAS_VACIO;
+        return null;
     }
 
     private boolean permiteLaLLaveFirmaDigital(boolean[] usosLlave) {

@@ -4,6 +4,7 @@ import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
+import ec.gob.senescyt.microservicios.commons.bundles.audit.Auditable;
 import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
 import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
 import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
@@ -104,5 +105,13 @@ public class FirmaDigitalResourceTest {
     public void debeEstarProtegidoElAccesoALosRecursos() {
         boolean esSeguro = recurso.getClass().isAnnotationPresent(RecursoSeguro.class);
         assertThat(esSeguro, is(true));
+    }
+
+    @Test
+    public void debeEstarAuditadoElProcesoDeFirmar() throws NoSuchMethodException {
+        boolean estaAuditado = recurso.getClass()
+                .getMethod("crearFirmaDigital", InformacionFirma.class)
+                .isAnnotationPresent(Auditable.class);
+        assertThat(estaAuditado, is(true));
     }
 }

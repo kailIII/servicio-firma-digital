@@ -76,6 +76,14 @@ public class ServicioFirmaDigitalTest {
     }
 
     @Test
+    public void debeContenerCopiaDelTextoOriginalAFirmar() throws FirmaDigitalExcepcion {
+        servicio.firmar(informacionFirma);
+        ArgumentCaptor<DocumentoFirmado> capturador = ArgumentCaptor.forClass(DocumentoFirmado.class);
+        verify(documentoFirmadoDAO, times(1)).guardar(capturador.capture());
+        assertThat(capturador.getValue().getTextoAFirmar(), is(informacionFirma.getTextoAFirmar()));
+    }
+
+    @Test
     public void debeContenerLaConfiguracionConLaQueSeRealizaLaFirmaAlGuardar() throws FirmaDigitalExcepcion {
         servicio.firmar(informacionFirma);
         ArgumentCaptor<DocumentoFirmado> capturador = ArgumentCaptor.forClass(DocumentoFirmado.class);

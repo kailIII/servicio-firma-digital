@@ -2,7 +2,6 @@ package ec.gob.senescyt.firma.security;
 
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
-import ec.gob.senescyt.firma.security.certs.CertificadoFactory;
 import ec.gob.senescyt.firma.security.certs.CertificadosRaizFactory;
 import ec.gob.senescyt.firma.security.certs.FirmaDigitalProxyConfiguracion;
 import org.junit.Before;
@@ -56,7 +55,6 @@ public class FirmaDigitalProxyTest {
     private CertificateFactory fabricaCertificados;
     private FirmaDigital firmaDigital;
     private CertificadosRaizFactory certificadosRaizFactory;
-    private CertificadoFactory certificadoFactory;
     private X509Certificate certificadoRaiz;
     private X509Certificate certificadoSubordinado;
     private X509Certificate certificadoHijo;
@@ -68,17 +66,18 @@ public class FirmaDigitalProxyTest {
     private final ArgumentCaptor<PKIXParameters> capturaParametros = ArgumentCaptor.forClass(PKIXParameters.class);
     @Mock
     private FirmaDigital firmaDigitalReal;
+    @Mock
+    private AlmacenLlavesProvider almacenLlaves;
 
 
     @Before
-    public void setUp() throws NoSuchAlgorithmException, CertificateException, IOException {
+    public void setUp() throws NoSuchAlgorithmException, CertificateException, IOException, AlmacenLlavesExcepcion {
         initMocks(this);
         mockStatic(CertPathValidator.class);
         mockStatic(CertificateFactory.class);
         validador = mock(CertPathValidator.class);
         fabricaCertificados = mock(CertificateFactory.class);
         certificadosRaizFactory = mock(CertificadosRaizFactory.class);
-        certificadoFactory = mock(CertificadoFactory.class);
         certificadoRaiz = mock(X509Certificate.class);
         certificadoSubordinado = mock(X509Certificate.class);
         certificadoHijo = mock(X509Certificate.class);
@@ -91,8 +90,8 @@ public class FirmaDigitalProxyTest {
         when(CertificateFactory.getInstance("X.509")).thenReturn(fabricaCertificados);
         when(certificadosRaizFactory.obtenerCertificadoRaiz(BCE_RAIZ)).thenReturn(certificadoRaiz);
         when(certificadosRaizFactory.obtenerCertificadoRaiz(BCE_SUBORDINADO)).thenReturn(certificadoSubordinado);
-        when(certificadoFactory.obtenerCertificado(caminoArchivo)).thenReturn(certificadoHijo);
-        firmaDigital = new FirmaDigitalProxy(firmaDigitalReal, certificadosRaizFactory, certificadoFactory, configuracion);
+        when(almacenLlaves.obtenerCertificadoDeLaFirma(caminoArchivo, contrasenia)).thenReturn(certificadoHijo);
+        firmaDigital = new FirmaDigitalProxy(firmaDigitalReal, certificadosRaizFactory, almacenLlaves, configuracion);
     }
 
     @Test
@@ -103,25 +102,8 @@ public class FirmaDigitalProxyTest {
     }
 
     @Test
-    public void debeAgregarElCertificadoSubordinadoEnLaLista() throws CertificateException, FirmaDigitalExcepcion, IOException {
-        ArrayList<Certificate> certificados = newArrayList(certificadoSubordinado);
-        when(fabricaCertificados.generateCertPath(certificados)).thenReturn(certPath);
-        firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
-        Mockito.verify(certificadosRaizFactory, times(1)).obtenerCertificadoRaiz(BCE_SUBORDINADO);
-    }
-
-    @Test
-    public void debeAgregarElCertificadoHijoEnLaLista() throws CertificateException, FirmaDigitalExcepcion, IOException {
-        ArrayList<Certificate> certificados = newArrayList(certificadoHijo);
-        when(fabricaCertificados.generateCertPath(certificados)).thenReturn(certPath);
-        firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
-        Mockito.verify(certificadoFactory, times(1)).obtenerCertificado(caminoArchivo);
-    }
-
-    @Test
-    public void debeGenerarElCertPathConLosCertificadosDeLaLista() throws CertificateException, FirmaDigitalExcepcion {
+    public void debeGenerarElCertPathConElCertificadoSubordinadoYElHijoDeLaLista() throws CertificateException, FirmaDigitalExcepcion {
         ArrayList<Certificate> certificados = newArrayList(certificadoHijo, certificadoSubordinado);
-        when(fabricaCertificados.generateCertPath(certificados)).thenReturn(certPath);
         firmaDigital.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
         Mockito.verify(fabricaCertificados, times(1)).generateCertPath(certificados);
     }

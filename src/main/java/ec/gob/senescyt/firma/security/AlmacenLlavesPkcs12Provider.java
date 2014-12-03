@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 public class AlmacenLlavesPkcs12Provider implements AlmacenLlavesProvider {
     public static final String ALMACEN_PKCS12 = "PKCS12";
@@ -39,6 +40,16 @@ public class AlmacenLlavesPkcs12Provider implements AlmacenLlavesProvider {
     private void cargarArchivosDeFirma(String caminoArchivo, String contrasenia) throws IOException, NoSuchAlgorithmException, CertificateException {
         try(InputStream archivo = new FileInputStream(caminoArchivo)) {
             almacenLlaves.load(archivo, contrasenia.toCharArray());
+        }
+    }
+
+    public X509Certificate obtenerCertificadoDeLaFirma(String caminoArchivo, String contrasenia) throws AlmacenLlavesExcepcion {
+        try {
+            cargarArchivosDeFirma(caminoArchivo, contrasenia);
+            String aliasParaFirmar = aliasProvider.obtenerPrimerAliasParaFirmar(almacenLlaves);
+            return (X509Certificate) almacenLlaves.getCertificate(aliasParaFirmar);
+        } catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
+            throw new AlmacenLlavesExcepcion("Error obteniendo el certificado digital", e);
         }
     }
 }

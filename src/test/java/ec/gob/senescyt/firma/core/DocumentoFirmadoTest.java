@@ -17,15 +17,17 @@ public class DocumentoFirmadoTest {
 
     private DocumentoFirmado documentoFirmado;
     private String firmaDigital;
+    private String textoAFirmar;
     private ConfiguracionFirma configuracionFirma;
     private long idDocumentoFirmado;
 
     @Before
     public void setUp() {
         firmaDigital = randomAlphabetic(10);
+        textoAFirmar = randomAlphabetic(300);
         configuracionFirma = new ConfiguracionFirma(randomAlphabetic(10), randomAlphabetic(10));
         idDocumentoFirmado = nextLong();
-        documentoFirmado = new DocumentoFirmado(idDocumentoFirmado, firmaDigital, configuracionFirma);
+        documentoFirmado = new DocumentoFirmado(idDocumentoFirmado, textoAFirmar, firmaDigital, configuracionFirma);
     }
 
     @Test
@@ -36,6 +38,11 @@ public class DocumentoFirmadoTest {
     @Test
     public void debeTenerLaFirmaDigital() {
         assertThat(documentoFirmado.getFirmaDigital(), is(firmaDigital));
+    }
+
+    @Test
+    public void debeTenerElDocumentoOriginal() {
+        assertThat(documentoFirmado.getTextoAFirmar(), is(textoAFirmar));
     }
 
     @Test

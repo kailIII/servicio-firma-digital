@@ -66,13 +66,12 @@ public class ServicioApplication extends MicroservicioAplicacion<MicroservicioCo
 
     private void configurarRecursoFirmaDigital(JerseyEnvironment jerseyEnvironment) {
         AliasProvider aliasProvider = new AliasProvider();
-        AlmacenLlavesProvider almacenLlavesProvider = null;
         FirmaDigital firmaDigital = null;
         try {
-            almacenLlavesProvider = new AlmacenLlavesPkcs12Provider(aliasProvider);
+            AlmacenLlavesProvider almacenLlavesProvider = new AlmacenLlavesPkcs12Provider(aliasProvider);
             firmaDigital = new FirmaDigitalImpl(almacenLlavesProvider);
         } catch (AlmacenLlavesExcepcion | NoSuchAlgorithmException e) {
-            LOGGER.log(Level.FINEST, "Error al cerar el almacen de llaves y la firma digital", e);
+            LOGGER.log(Level.FINEST, "Error al crear el almacen de llaves y la firma digital", e);
         }
         ConfiguracionFirmaDAO configuracionFirmaDAO = new ConfiguracionFirmaDAO(getSessionFactory(), defaultSchema);
         DocumentoFirmadoDAO documentoFirmadoDAO = new DocumentoFirmadoDAO(getSessionFactory(), defaultSchema);

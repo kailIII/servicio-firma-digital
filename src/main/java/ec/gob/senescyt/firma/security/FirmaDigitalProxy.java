@@ -3,7 +3,6 @@ package ec.gob.senescyt.firma.security;
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.exceptions.ValidacionCertificadoExcepcion;
-import ec.gob.senescyt.firma.security.certs.CertificadoFactory;
 import ec.gob.senescyt.firma.security.certs.CertificadosRaizFactory;
 import ec.gob.senescyt.firma.security.certs.FirmaDigitalProxyConfiguracion;
 
@@ -28,15 +27,16 @@ public class FirmaDigitalProxy implements FirmaDigital {
 
     private FirmaDigital firmaDigitalReal;
     private CertificadosRaizFactory certificadosRaizFactory;
-    private CertificadoFactory certificadoFactory;
+    private AlmacenLlavesProvider almacenLlaves;
     private FirmaDigitalProxyConfiguracion configuracion;
     private final CertificateFactory fabricaCertificados;
     private final CertPathValidator validadorCertificados;
 
-    public FirmaDigitalProxy(FirmaDigital firmaDigitalReal, CertificadosRaizFactory certificadosRaizFactory, CertificadoFactory certificadoFactory, FirmaDigitalProxyConfiguracion configuracion) throws CertificateException, NoSuchAlgorithmException {
+    public FirmaDigitalProxy(FirmaDigital firmaDigitalReal, CertificadosRaizFactory certificadosRaizFactory,
+                             AlmacenLlavesProvider almacenLlaves, FirmaDigitalProxyConfiguracion configuracion) throws CertificateException, NoSuchAlgorithmException {
         this.firmaDigitalReal = firmaDigitalReal;
         this.certificadosRaizFactory = certificadosRaizFactory;
-        this.certificadoFactory = certificadoFactory;
+        this.almacenLlaves = almacenLlaves;
         this.configuracion = configuracion;
         fabricaCertificados = CertificateFactory.getInstance("X.509");
         validadorCertificados = CertPathValidator.getInstance("PKIX");
@@ -45,9 +45,9 @@ public class FirmaDigitalProxy implements FirmaDigital {
     @Override
     public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws FirmaDigitalExcepcion {
         try {
-            validarCertificadoDigital(caminoArchivo);
-        } catch (IOException | CertificateException | InvalidAlgorithmParameterException | CertPathValidatorException e) {
-            throw new ValidacionCertificadoExcepcion(e);
+            validarCertificadoDigital(caminoArchivo, contrasenia);
+        } catch (IOException | CertificateException | InvalidAlgorithmParameterException | CertPathValidatorException | AlmacenLlavesExcepcion  e) {
+                throw new ValidacionCertificadoExcepcion(e);
         }
         return firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
     }
@@ -57,17 +57,17 @@ public class FirmaDigitalProxy implements FirmaDigital {
         return firmaDigitalReal.existeLlavePrivadaParaFirmar(caminoArchivo, contrasenia);
     }
 
-    private void validarCertificadoDigital(String caminoArchivo) throws IOException, CertificateException, InvalidAlgorithmParameterException, CertPathValidatorException {
-        CertPath certificadosParaValidar = generarCertPath(caminoArchivo);
+    private void validarCertificadoDigital(String caminoArchivo, String contrasenia) throws IOException, CertificateException, InvalidAlgorithmParameterException, CertPathValidatorException, AlmacenLlavesExcepcion {
+        CertPath certificadosParaValidar = generarCertPath(caminoArchivo, contrasenia);
         TrustAnchor anchorRaiz = generarAnchor();
         PKIXParameters parametros = new PKIXParameters(newHashSet(anchorRaiz));
         configuracion.configurar();
         validadorCertificados.validate(certificadosParaValidar, parametros);
     }
 
-    private CertPath generarCertPath(String caminoArchivo) throws IOException, CertificateException {
+    private CertPath generarCertPath(String caminoArchivo, String contrasenia) throws IOException, CertificateException, AlmacenLlavesExcepcion {
         X509Certificate certificadoSubordinado = certificadosRaizFactory.obtenerCertificadoRaiz(BCE_SUBORDINADO);
-        X509Certificate certificadoHijo = certificadoFactory.obtenerCertificado(caminoArchivo);
+        X509Certificate certificadoHijo = almacenLlaves.obtenerCertificadoDeLaFirma(caminoArchivo, contrasenia);
         return fabricaCertificados.generateCertPath(newArrayList(certificadoHijo, certificadoSubordinado));
     }
 
