@@ -1,3 +1,5 @@
+import groovy.text.SimpleTemplateEngine
+
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'flyway'
@@ -80,13 +82,22 @@ task wrapper(type: Wrapper) {
 
 mainClassName = 'ec.gob.senescyt.ServicioApplication'
 
+task configurarFirmaDigital(type: Exec, dependsOn: flywayMigrate) {
+    def certsDir = "${new File(".").absolutePath}/src/test/resources/"
+    def archivoPlantilla = new File('src/main/resources/configurarFirma.sql.template')
+    def motorPlantilla = new SimpleTemplateEngine()
+    def plantilla = motorPlantilla.createTemplate(archivoPlantilla).make(["certsDir": certsDir])
+    commandLine "export", "PGPASSWORD=Passw0rd"
+    commandLine "psql", "-h", "localhost", "-d", "senescyt", "-U", "thoughtworks", "-a", "-c", plantilla.toString()
+}
+
 run {
-    dependsOn += configurarServicio
+    dependsOn += [configurarServicio, configurarFirmaDigital]
     args 'server', archivoConfiguracion
 }
 
 test {
-    dependsOn configurarServicio, pmdMain, pmdTest, pmdIntTest, findbugsMain, findbugsTest, findbugsIntTest
+    dependsOn pmdMain, pmdTest, pmdIntTest, findbugsMain, findbugsTest, findbugsIntTest
 }
 
 flyway {
@@ -101,7 +112,7 @@ tasks.withType(org.flywaydb.gradle.task.AbstractFlywayTask) {
 }
 
 tasks.withType(Test) {
-    dependsOn += configurarServicio
+    dependsOn += [configurarServicio, configurarFirmaDigital]
 
     testLogging {
         showStandardStreams = true

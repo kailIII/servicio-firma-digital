@@ -1,3 +1,5 @@
+import groovy.text.SimpleTemplateEngine
+
 apply plugin: 'ssh'
 
 buildscript {
@@ -27,17 +29,15 @@ task deployQA(type: SshTask) {
     session(remotes.snieseqa) {
         def targetDir = "/home/sniese/servicios/servicio-firma-digital/"
         def certsDir = "${targetDir}certs/"
-        def consultaCertificado = """
-            INSERT INTO servicio_firma_digital.configuraciones_firmas (nombreUsuario, caminoArchivo)
-            SELECT 'admin', '${certsDir}test.p12' WHERE NOT EXISTS
-            (SELECT * FROM servicio_firma_digital.configuraciones_firmas WHERE nombreUsuario = 'admin');
-        """
+        def archivoPlantilla = new File('src/main/resources/configurarFirma.sql.template')
+        def motorPlantilla = new SimpleTemplateEngine()
+        def plantilla = motorPlantilla.createTemplate(archivoPlantilla).make(["certsDir": certsDir])
         execute "mkdir -p ${certsDir}"
         put 'build/libs/servicio-standalone.jar', targetDir
         put 'servicio.yml', targetDir + 'servicio.yml'
         put 'sniese.keystore', targetDir
         put 'src/test/resources/test.p12', certsDir
-        execute "PGPASSWORD=Passw0rd psql -h localhost -d senescyt -U thoughtworks -a -c \"$consultaCertificado\""
+        execute "PGPASSWORD=Passw0rd psql -h localhost -d senescyt -U thoughtworks -a -c \"${plantilla.toString()}\""
         executeSudo "service servicio-firma-digital restart", pty: true
     }
 }
