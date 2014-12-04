@@ -87,8 +87,7 @@ task configurarFirmaDigital(type: Exec, dependsOn: flywayMigrate) {
     def archivoPlantilla = new File('src/main/resources/configurarFirma.sql.template')
     def motorPlantilla = new SimpleTemplateEngine()
     def plantilla = motorPlantilla.createTemplate(archivoPlantilla).make(["certsDir": certsDir])
-    commandLine "export", "PGPASSWORD=Passw0rd"
-    commandLine "psql", "-h", "localhost", "-d", "senescyt", "-U", "thoughtworks", "-a", "-c", plantilla.toString()
+    commandLine './src/main/resources/configurarFirma.sh', plantilla.toString()
 }
 
 run {
