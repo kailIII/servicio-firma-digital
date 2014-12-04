@@ -37,7 +37,7 @@ task deployQA(type: SshTask) {
         put 'servicio.yml', targetDir + 'servicio.yml'
         put 'sniese.keystore', targetDir
         put 'src/test/resources/test.p12', certsDir
-        execute "PGPASSWORD=Passw0rd psql -h localhost -d senescyt -U thoughtworks -a -c \"${plantilla.toString()}\""
+        execute 'PGPASSWORD=Passw0rd psql -h localhost -d senescyt -U thoughtworks -a -c "' + plantilla.toString() + '"';
         executeSudo "service servicio-firma-digital restart", pty: true
     }
 }
