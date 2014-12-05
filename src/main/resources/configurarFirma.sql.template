@@ -1,11 +1,9 @@
 DO
-\$do\$
-BEGIN
-IF EXISTS (SELECT * FROM pg_class WHERE relname = 'configuraciones_firmas') THEN
+'BEGIN
+IF EXISTS (SELECT * FROM pg_class WHERE relname = ''configuraciones_firmas'') THEN
   INSERT INTO servicio_firma_digital.configuraciones_firmas (nombreUsuario, caminoArchivo)
-    SELECT 'admin', '${certsDir}test.p12'
+    SELECT ''admin'', ''${certsDir}test.p12''
     WHERE NOT EXISTS
-    (SELECT * FROM servicio_firma_digital.configuraciones_firmas WHERE nombreUsuario = 'admin');
+    (SELECT * FROM servicio_firma_digital.configuraciones_firmas WHERE nombreUsuario = ''admin'');
 END IF;
-END
-\$do\$
+END'
