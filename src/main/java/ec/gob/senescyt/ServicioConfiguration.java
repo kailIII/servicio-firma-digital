@@ -1,7 +1,7 @@
 package ec.gob.senescyt;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import ec.gob.senescyt.microservicios.commons.MicroservicioConfiguracion;
+import ec.gob.senescyt.sniese.commons.MicroservicioConfiguracion;
 import io.dropwizard.db.DataSourceFactory;
 
 import javax.validation.Valid;

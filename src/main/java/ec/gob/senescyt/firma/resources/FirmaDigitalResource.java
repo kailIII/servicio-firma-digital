@@ -4,10 +4,10 @@ import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
-import ec.gob.senescyt.microservicios.commons.bundles.audit.Auditable;
-import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
-import ec.gob.senescyt.microservicios.commons.filters.RecursoSeguro;
-import ec.gob.senescyt.microservicios.commons.security.PrincipalProvider;
+import ec.gob.senescyt.sniese.commons.bundles.audit.Auditable;
+import ec.gob.senescyt.sniese.commons.core.InformacionFirma;
+import ec.gob.senescyt.sniese.commons.filters.RecursoSeguro;
+import ec.gob.senescyt.sniese.commons.security.PrincipalProvider;
 import io.dropwizard.hibernate.UnitOfWork;
 
 import javax.ws.rs.POST;

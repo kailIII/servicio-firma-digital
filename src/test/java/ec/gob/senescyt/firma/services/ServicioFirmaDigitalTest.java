@@ -7,7 +7,7 @@ import ec.gob.senescyt.firma.dao.DocumentoFirmadoDAO;
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.security.FirmaDigitalImpl;
-import ec.gob.senescyt.microservicios.commons.core.InformacionFirma;
+import ec.gob.senescyt.sniese.commons.core.InformacionFirma;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

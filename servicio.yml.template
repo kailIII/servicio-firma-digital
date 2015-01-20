@@ -43,4 +43,4 @@ server:
       validateCerts: false
 
 auditoria:
-  writerClass: ec.gob.senescyt.microservicios.commons.bundles.audit.LogAuditoriaWriter
+  writerClass: ec.gob.senescyt.sniese.commons.bundles.audit.LogAuditoriaWriter

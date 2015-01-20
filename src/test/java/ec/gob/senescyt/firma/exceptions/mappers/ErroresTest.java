@@ -1,6 +1,6 @@
 package ec.gob.senescyt.firma.exceptions.mappers;
 
-import ec.gob.senescyt.microservicios.tests.SerializacionBaseTest;
+import ec.gob.senescyt.sniese.commons.tests.SerializacionBaseTest;
 import org.junit.Before;
 import org.junit.Test;
 
