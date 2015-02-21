@@ -10,9 +10,7 @@ apply plugin: 'findbugs'
 apply plugin: 'jacoco'
 apply from: 'configuracion.gradle'
 
-tasks.withType(Compile) {
-    options.encoding = 'UTF-8'
-}
+compileJava.options.encoding = 'UTF-8'
 
 buildscript {
     repositories {
@@ -78,7 +76,7 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.3'
 }
 
 mainClassName = 'ec.gob.senescyt.ServicioApplication'
@@ -135,6 +133,7 @@ task oneJar(type: OneJar, dependsOn: clean) {
 
 pmd {
     targetJdk = '1.7'
+    toolVersion = '4.3'
 }
 
 project.ext.pmdRuleSets = [
@@ -179,11 +178,6 @@ tasks.withType(FindBugs) {
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
-}
-
-jacoco {
-    toolVersion = '0.7.1.201405082137'
-    excludes = generatedSources
 }
 
 jacocoTestReport {
