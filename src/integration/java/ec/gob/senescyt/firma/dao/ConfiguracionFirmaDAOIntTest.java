@@ -22,7 +22,7 @@ public class ConfiguracionFirmaDAOIntTest extends FirmaDigitalBaseIntTest {
 
     @Override
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         configuracionFirmaDAO = new ConfiguracionFirmaDAO(sessionFactory, defaultSchema);
         nombreUsuarioActivo = randomAlphabetic(15);

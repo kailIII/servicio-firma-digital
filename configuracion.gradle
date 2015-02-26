@@ -14,13 +14,17 @@ project.ext {
 }
 
 task expandirConfig(type: Copy) {
-    def hostBaseDeDatos = obtenerValorDesdeVariableDeEntorno("$System.env.IP_BASE_DATOS_PREPRO", "localhost")
-    def clave = obtenerValorDesdeVariableDeEntorno("$System.env.CLAVE_SNIESE_KEY_STORE", "sniese")
+    def hostBaseDeDatos = obtenerValorDesdeVariableDeEntorno("IP_BASE_DATOS_PREPRO", "localhost")
+    def clave = obtenerValorDesdeVariableDeEntorno("CLAVE_SNIESE_KEY_STORE", "sniese")
+    def urlBaseAutenticacion = obtenerValorDesdeVariableDeEntorno("URL_BASE_AUTENTICACION", "https://localhost:8447/")
+    def urlBaseAutorizacion = obtenerValorDesdeVariableDeEntorno("URL_BASE_AUTORIZACION", "https://localhost:8443/")
 
     from('.')
     include('**/*.yml.template')
+    include('**/*.ini.template')
     rename { String fileName -> fileName.replace('.template', '') }
-    expand(host: hostBaseDeDatos, claveSnieseKeyStore: clave)
+    expand(host: hostBaseDeDatos, claveSnieseKeyStore: clave,
+            urlBaseAutenticacion: urlBaseAutenticacion, urlBaseAutorizacion: urlBaseAutorizacion)
     into('.')
 }
 
@@ -35,10 +39,11 @@ task configurarServicio(dependsOn: expandirConfig) {
     }
 }
 
-def obtenerValorDesdeVariableDeEntorno(variableEntorno, valorPorDefecto) {
-    def valorNulo = "null"
-    if (variableEntorno == valorNulo) {
-        return valorPorDefecto
+def obtenerValorDesdeVariableDeEntorno(key, valorPorDefecto) {
+    if (System.getenv(key) != null) {
+        return System.getenv(key)
+    } else if (this.properties[key] != null) {
+        return this.properties[key]
     }
-    return variableEntorno
+    return valorPorDefecto
 }

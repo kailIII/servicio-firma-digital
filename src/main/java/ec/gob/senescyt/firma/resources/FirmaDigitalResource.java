@@ -4,9 +4,7 @@ import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
-import ec.gob.senescyt.sniese.commons.bundles.audit.Auditable;
 import ec.gob.senescyt.sniese.commons.core.InformacionFirma;
-import ec.gob.senescyt.sniese.commons.filters.RecursoSeguro;
 import ec.gob.senescyt.sniese.commons.security.PrincipalProvider;
 import io.dropwizard.hibernate.UnitOfWork;
 
@@ -21,7 +19,6 @@ import static org.eclipse.jetty.http.HttpStatus.CREATED_201;
 import static org.eclipse.jetty.http.HttpStatus.NOT_FOUND_404;
 import static org.eclipse.jetty.http.HttpStatus.OK_200;
 
-@RecursoSeguro
 @Path("/firmaDigital")
 @Produces(MediaType.APPLICATION_JSON)
 public class FirmaDigitalResource {
@@ -34,7 +31,6 @@ public class FirmaDigitalResource {
     }
 
     @POST
-    @Auditable
     @UnitOfWork
     public Response crearFirmaDigital(InformacionFirma informacionFirma) throws FirmaDigitalExcepcion {
         if (coincideUsuarioConLaInformacion(informacionFirma)) {

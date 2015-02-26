@@ -10,6 +10,7 @@ logs/
 .DS_Store
 servicio-dev.yml
 src/integration/resources/test-integracion.yml
+src/main/resources/*.ini
 sniese.jks
 *.der
 *.keystore

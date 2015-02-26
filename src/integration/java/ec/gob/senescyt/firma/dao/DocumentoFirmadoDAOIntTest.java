@@ -12,20 +12,19 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class DocumentoFirmadoDAOIntTest extends FirmaDigitalBaseIntTest{
+public class DocumentoFirmadoDAOIntTest extends FirmaDigitalBaseIntTest {
 
     private DocumentoFirmadoDAO documentoFirmadoDAO;
     private ConfiguracionFirma configuracionFirma;
 
     @Override
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         documentoFirmadoDAO = new DocumentoFirmadoDAO(sessionFactory, defaultSchema);
         configuracionFirma = new ConfiguracionFirma(randomAlphabetic(10), randomAlphabetic(10));
         ConfiguracionFirmaDAO configuracionFirmaDAO = new ConfiguracionFirmaDAO(sessionFactory, defaultSchema);
         configuracionFirmaDAO.guardar(configuracionFirma);
-
     }
 
     @Test

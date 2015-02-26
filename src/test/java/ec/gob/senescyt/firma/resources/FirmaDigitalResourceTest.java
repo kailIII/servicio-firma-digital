@@ -4,9 +4,7 @@ import ec.gob.senescyt.firma.core.DocumentoFirmado;
 import ec.gob.senescyt.firma.exceptions.AlmacenLlavesExcepcion;
 import ec.gob.senescyt.firma.exceptions.FirmaDigitalExcepcion;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
-import ec.gob.senescyt.sniese.commons.bundles.audit.Auditable;
 import ec.gob.senescyt.sniese.commons.core.InformacionFirma;
-import ec.gob.senescyt.sniese.commons.filters.RecursoSeguro;
 import ec.gob.senescyt.sniese.commons.security.PrincipalProvider;
 import ec.gob.senescyt.sniese.commons.security.Usuario;
 import ec.gob.senescyt.sniese.commons.security.UsuarioAutenticado;
@@ -99,19 +97,5 @@ public class FirmaDigitalResourceTest {
         when(servicioFirmaDigital.validarCredencialesFirma(usuario.getNombreUsuario(), contrasenia)).thenReturn(false);
         Response respuesta = recurso.validarCredenciales(contrasenia);
         assertThat(respuesta.getStatus(), is(NOT_FOUND_404));
-    }
-
-    @Test
-    public void debeEstarProtegidoElAccesoALosRecursos() {
-        boolean esSeguro = recurso.getClass().isAnnotationPresent(RecursoSeguro.class);
-        assertThat(esSeguro, is(true));
-    }
-
-    @Test
-    public void debeEstarAuditadoElProcesoDeFirmar() throws NoSuchMethodException {
-        boolean estaAuditado = recurso.getClass()
-                .getMethod("crearFirmaDigital", InformacionFirma.class)
-                .isAnnotationPresent(Auditable.class);
-        assertThat(estaAuditado, is(true));
     }
 }

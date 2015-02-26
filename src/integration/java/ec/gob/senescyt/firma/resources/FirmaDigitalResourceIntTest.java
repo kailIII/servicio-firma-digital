@@ -1,13 +1,12 @@
 package ec.gob.senescyt.firma.resources;
 
 import com.sun.jersey.api.client.ClientResponse;
-import ec.gob.senescyt.ServicioApplication;
+import ec.gob.senescyt.firma.FirmaDigitalBaseIntTest;
 import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.exceptions.mappers.Errores;
 import ec.gob.senescyt.sniese.commons.core.InformacionFirma;
 import ec.gob.senescyt.sniese.commons.security.UsuarioAutenticado;
-import ec.gob.senescyt.sniese.commons.tests.RecursoSeguroIntegracionTest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,9 +22,8 @@ import static org.eclipse.jetty.http.HttpStatus.OK_200;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
 
-public class FirmaDigitalResourceIntTest extends RecursoSeguroIntegracionTest {
+public class FirmaDigitalResourceIntTest extends FirmaDigitalBaseIntTest {
 
     private static final String CONTRASENIA = "Password#1";
     private static final String CONTRASENIA_CERTIFICADO_INVALIDO = "Password#2";
@@ -35,15 +33,12 @@ public class FirmaDigitalResourceIntTest extends RecursoSeguroIntegracionTest {
     private static final String RECURSO_VALIDACION_CONFIGURACION_FIRMA = "firmaDigital/credenciales/validar";
     private String nombreUsuario;
 
-    public FirmaDigitalResourceIntTest() {
-        super(ServicioApplication.class);
-    }
-
     @Override
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
-        configurarPrincipal();
+        nombreUsuario = randomAlphabetic(10);
+        configurarUsuarioConPermisos(new UsuarioAutenticado(nombreUsuario, randomAlphabetic(5)));
     }
 
     @Test
@@ -93,12 +88,6 @@ public class FirmaDigitalResourceIntTest extends RecursoSeguroIntegracionTest {
         configurarFirmaConUsuarioYArchivo(nombreUsuario, CERTIFICADO_VALIDO);
         ClientResponse respuesta = hacerPost(RECURSO_VALIDACION_CONFIGURACION_FIRMA, randomAlphabetic(12));
         assertThat(respuesta.getStatus(), is(NOT_FOUND_404));
-    }
-
-    private void configurarPrincipal() {
-        nombreUsuario = randomAlphabetic(10);
-        UsuarioAutenticado usuario = new UsuarioAutenticado(nombreUsuario, randomAlphabetic(10));
-        when(principalProvider.obtenerUsuario()).thenReturn(usuario);
     }
 
     private void configurarFirmaConUsuarioYArchivo(String nombreUsuario, String archivo) {
