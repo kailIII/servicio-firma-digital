@@ -94,7 +94,7 @@ public class FirmaDigitalResourceIntTest extends FirmaDigitalBaseIntTest {
         ConfiguracionFirmaDAO configuracionFirmaDAO = new ConfiguracionFirmaDAO(sessionFactory, defaultSchema);
         ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
         URL resource = systemClassLoader.getResource(archivo);
-        String caminoArchivo = resource != null ? resource.getPath(): archivo;
+        String caminoArchivo = resource != null ? resource.getPath() : archivo;
         ConfiguracionFirma configuracionFirma = new ConfiguracionFirma(nombreUsuario, caminoArchivo);
         configuracionFirmaDAO.guardar(configuracionFirma);
     }

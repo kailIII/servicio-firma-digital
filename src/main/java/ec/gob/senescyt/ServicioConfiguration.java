@@ -14,11 +14,18 @@ public class ServicioConfiguration extends MicroservicioConfiguracion {
     @JsonProperty("database")
     private final DataSourceFactory database = new DataSourceFactory();
 
+    @NotNull
+    private boolean activarProduccion = false;
+
     public DataSourceFactory getDataSourceFactory() {
         return database;
     }
 
     public String getDefaultSchema() {
         return database.getProperties().get("hibernate.default_schema");
+    }
+
+    public boolean isActivarProduccion() {
+        return activarProduccion;
     }
 }
