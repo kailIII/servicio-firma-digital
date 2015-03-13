@@ -1,6 +1,9 @@
 package ec.gob.senescyt.firma.security.certs;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,6 +18,8 @@ import static ec.gob.senescyt.firma.security.certs.TiposCertificadosRaiz.BCE_SUB
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({CertificadosRaizFactory.class})
 public class CertificadosRaizFactoryTest {
 
     @Test
@@ -34,7 +39,7 @@ public class CertificadosRaizFactoryTest {
     private X509Certificate obtenerCertificado(String nombreArchivo) throws CertificateException, IOException {
         URL recurso = CertificadosRaizFactoryTest.class.getResource(nombreArchivo);
         CertificateFactory fabrica = CertificateFactory.getInstance("X.509");
-        try(InputStream archivoCertificado = new FileInputStream(recurso.getPath())) {
+        try (InputStream archivoCertificado = new FileInputStream(recurso.getPath())) {
             return (X509Certificate) fabrica.generateCertificate(archivoCertificado);
         }
     }
