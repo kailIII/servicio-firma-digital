@@ -17,6 +17,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.PKIXParameters;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
+import java.util.logging.Logger;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
@@ -46,8 +47,9 @@ public class FirmaDigitalProxy implements FirmaDigital {
     public byte[] firmar(String cadenaAFirmar, String caminoArchivo, String contrasenia) throws FirmaDigitalExcepcion {
         try {
             validarCertificadoDigital(caminoArchivo, contrasenia);
-        } catch (IOException | CertificateException | InvalidAlgorithmParameterException | CertPathValidatorException | AlmacenLlavesExcepcion  e) {
-                throw new ValidacionCertificadoExcepcion(e);
+        } catch (IOException | CertificateException | InvalidAlgorithmParameterException | CertPathValidatorException | AlmacenLlavesExcepcion e) {
+            Logger.getLogger(this.getClass().getName()).info(e.getLocalizedMessage());
+            throw new ValidacionCertificadoExcepcion(e);
         }
         return firmaDigitalReal.firmar(cadenaAFirmar, caminoArchivo, contrasenia);
     }
