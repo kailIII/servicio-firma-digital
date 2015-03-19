@@ -19,6 +19,9 @@ task expandirConfig(type: Copy) {
     def activarProxyProduccion = obtenerValorDesdeVariableDeEntorno("ACTIVAR_PROXY_PRODUCCION", "false")
     def urlBaseAutenticacion = obtenerValorDesdeVariableDeEntorno("URL_BASE_AUTENTICACION", "https://localhost:8447/")
     def urlBaseAutorizacion = obtenerValorDesdeVariableDeEntorno("URL_BASE_AUTORIZACION", "https://localhost:8443/")
+    def cantidadInicialConnexiones = obtenerValorDesdeVariableDeEntorno("CANTIDAD_INICIAL_CONEXIONES", "1")
+    def cantidadMinimaConnexiones = obtenerValorDesdeVariableDeEntorno("CANTIDAD_MINIMA_CONEXIONES", "1")
+    def cantidadMaximaConnexiones = obtenerValorDesdeVariableDeEntorno("CANTIDAD_MAXIMA_CONEXIONES", "2")
 
     from('.')
     include('**/*.yml.template')
@@ -29,7 +32,11 @@ task expandirConfig(type: Copy) {
             claveSnieseKeyStore: clave,
             proxyActivo: activarProxyProduccion,
             urlBaseAutenticacion: urlBaseAutenticacion,
-            urlBaseAutorizacion: urlBaseAutorizacion)
+            urlBaseAutorizacion: urlBaseAutorizacion,
+            cantidadInicialConnexiones: cantidadInicialConnexiones,
+            cantidadMinimaConnexiones: cantidadMinimaConnexiones,
+            cantidadMaximaConnexiones: cantidadMaximaConnexiones
+    )
     into('.')
 }
 

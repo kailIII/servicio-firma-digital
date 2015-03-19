@@ -3,17 +3,19 @@ database:
   user: thoughtworks
   password: Passw0rd
   url: jdbc:postgresql://${host}/senescyt
-  maxWaitForConnection: 1s
-  validationQuery: "/* DB Health Check */ SELECT 1"
-  initialSize: 1
-  minSize: 1
-  maxSize: 2
-  checkConnectionWhileIdle: false
+
   properties:
     charSet: UTF-8
     hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate.show_sql: false
     hibernate.default_schema: servicio_firma_digital
+
+  maxWaitForConnection: 1s
+  validationQuery: "/* DB Health Check */ SELECT 1"
+  initialSize: ${cantidadInicialConnexiones}
+  minSize: ${cantidadMinimaConnexiones}
+  maxSize: ${cantidadMaximaConnexiones}
+  checkConnectionWhileIdle: false
 
 logging:
   level: INFO
