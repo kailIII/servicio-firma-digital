@@ -21,12 +21,12 @@ logging:
 server:
   adminConnectors:
     - type: http
-      port:  8460
+      port:  8111
   applicationConnectors:
     - type: http
-      port: 8109
+      port: 8110
     - type: https
-      port: 8459
+      port: 8458
       keyStorePath: sniese.keystore
       keyStorePassword: ${claveSnieseKeyStore}
       validateCerts: false
