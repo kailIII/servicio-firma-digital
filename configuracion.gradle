@@ -22,6 +22,22 @@ task expandirConfig(type: Copy) {
     def cantidadInicialConnexiones = obtenerValorDesdeVariableDeEntorno("CANTIDAD_INICIAL_CONEXIONES", "1")
     def cantidadMinimaConnexiones = obtenerValorDesdeVariableDeEntorno("CANTIDAD_MINIMA_CONEXIONES", "1")
     def cantidadMaximaConnexiones = obtenerValorDesdeVariableDeEntorno("CANTIDAD_MAXIMA_CONEXIONES", "2")
+    def metricas = obtenerValorDesdeVariableDeEntorno("METRICAS", "false")
+    def metricasHost = obtenerValorDesdeVariableDeEntorno("IP_METRICAS", "localhost")
+    def metricasPuerto = obtenerValorDesdeVariableDeEntorno("PUERTO_METRICAS", "2003")
+    def configuracionMetricas = ""
+
+    if(metricas.equals("true")){
+        configuracionMetricas = "metrics:\n" +
+                "  frequency: 5 seconds\n" +
+                "  reporters:\n" +
+                "    - type: graphite\n" +
+                "      host: ${metricasHost}\n" +
+                "      port: ${metricasPuerto}\n" +
+                "      durationUnit: seconds\n" +
+                "      rateUnit: minutes\n" +
+                "      prefix: servicio-firma-digital"
+    }
 
     from('.')
     include('**/*.yml.template')
@@ -35,7 +51,10 @@ task expandirConfig(type: Copy) {
             urlBaseAutorizacion: urlBaseAutorizacion,
             cantidadInicialConnexiones: cantidadInicialConnexiones,
             cantidadMinimaConnexiones: cantidadMinimaConnexiones,
-            cantidadMaximaConnexiones: cantidadMaximaConnexiones
+            cantidadMaximaConnexiones: cantidadMaximaConnexiones,
+            metricasHost: metricasHost,
+            metricasPuerto: metricasPuerto,
+            configuracionMetricas: configuracionMetricas
     )
     into('.')
 }

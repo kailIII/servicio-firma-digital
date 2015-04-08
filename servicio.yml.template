@@ -48,3 +48,5 @@ auditoria:
   writerClass: ec.gob.senescyt.sniese.commons.bundles.audit.LogAuditoriaWriter
 
 activarProduccion: ${proxyActivo}
+
+${configuracionMetricas}
