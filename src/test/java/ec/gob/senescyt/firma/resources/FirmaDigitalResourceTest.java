@@ -7,7 +7,7 @@ import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
 import ec.gob.senescyt.sniese.commons.core.InformacionFirma;
 import ec.gob.senescyt.sniese.commons.security.PrincipalProvider;
 import ec.gob.senescyt.sniese.commons.security.Usuario;
-import ec.gob.senescyt.sniese.commons.security.UsuarioAutenticado;
+import ec.gob.senescyt.sniese.commons.tests.builders.UsuarioAutenticadoBuilder;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class FirmaDigitalResourceTest {
     public void setUp() throws FirmaDigitalExcepcion {
         initMocks(this);
         recurso = new FirmaDigitalResource(servicioFirmaDigital, principalProvider);
-        usuario = new UsuarioAutenticado(randomAlphabetic(10), randomAlphabetic(10));
+        usuario = UsuarioAutenticadoBuilder.nuevo().generar();
         contrasenia = randomAlphabetic(10);
         informacionFirma = new InformacionFirma(randomAlphabetic(300), usuario.getNombreUsuario(), contrasenia);
         when(servicioFirmaDigital.firmar(informacionFirma)).thenReturn(documentoFirmado);

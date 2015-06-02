@@ -1,7 +1,7 @@
 [main]
 SeguridadRealm = ec.gob.senescyt.sniese.commons.security.shiro.SeguridadRealm
-SeguridadRealm.urlBaseAutenticacion = ${urlBaseAutenticacion}
-SeguridadRealm.urlBaseAutorizacion = ${urlBaseAutorizacion}
+SeguridadRealm.tokenAutenticacionServicio = ${tokenAutenticacionServicio}
+SeguridadRealm.servicioUsuarioCliente = ${urlBaseAutorizacion}
 securityManager.realms = \$SeguridadRealm
 cacheManager = ec.gob.senescyt.sniese.commons.security.cache.EhCacheManager
 securityManager.cacheManager = \$cacheManager

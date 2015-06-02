@@ -17,9 +17,12 @@ import ec.gob.senescyt.firma.security.FirmaDigitalProxy;
 import ec.gob.senescyt.firma.security.certs.CertificadosRaizFactory;
 import ec.gob.senescyt.firma.security.certs.FirmaDigitalProxyConfiguracion;
 import ec.gob.senescyt.firma.services.ServicioFirmaDigital;
-import ec.gob.senescyt.sniese.commons.MicroservicioAplicacion;
+import ec.gob.senescyt.sniese.commons.applications.AplicacionPersistente;
+import ec.gob.senescyt.sniese.commons.applications.AplicacionSegura;
+import ec.gob.senescyt.sniese.commons.applications.AplicacionSniese;
 import ec.gob.senescyt.sniese.commons.security.PrincipalProvider;
 import ec.gob.senescyt.sniese.commons.security.PrincipalProviderImpl;
+import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
@@ -33,17 +36,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SuppressWarnings("PMD.ExcessiveImports")
-public class ServicioApplication extends MicroservicioAplicacion<ServicioConfiguration> {
+public class ServicioApplication extends Application<ServicioConfiguration> {
 
+    private final AplicacionSniese aplicacion;
     private final HibernateBundle<ServicioConfiguration> hibernate = new HibernateBundle<ServicioConfiguration>(
             ConfiguracionFirma.class, DocumentoFirmado.class) {
         @Override
         public DataSourceFactory getDataSourceFactory(ServicioConfiguration configuration) {
-            return configuration.getDataSourceFactory();
+            return configuration.getConfiguracionPersistente().getDatabase();
         }
     };
     private String defaultSchema;
     private static final Logger LOGGER = Logger.getLogger(ServicioApplication.class.getName());
+
+    public ServicioApplication() {
+        aplicacion = new AplicacionSniese(
+                new AplicacionPersistente(
+                        new AplicacionSegura(
+                                null,
+                                new PrincipalProviderImpl()),
+                        hibernate));
+    }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public static void main(String[] args) throws Exception {
@@ -52,21 +65,23 @@ public class ServicioApplication extends MicroservicioAplicacion<ServicioConfigu
 
     @Override
     public String getName() {
-        return "servicio";
+        return "servicio-firma-digital";
     }
 
     @Override
-    public void inicializar(Bootstrap<ServicioConfiguration> bootstrap) {
-        // no hace nada
+    public void initialize(Bootstrap<ServicioConfiguration> bootstrap) {
+        aplicacion.initialize(bootstrap);
     }
 
     @Override
-    public void ejecutar(ServicioConfiguration configuracion, Environment environment) {
-        JerseyEnvironment jerseyEnvironment = environment.jersey();
-        this.defaultSchema = configuracion.getDefaultSchema();
+    public void run(ServicioConfiguration configuracion, Environment ambiente) {
+        JerseyEnvironment jerseyEnvironment = ambiente.jersey();
+        this.defaultSchema = configuracion.getConfiguracionPersistente().getDefaultSchema();
         configurarRecursoFirmaDigital(configuracion, jerseyEnvironment);
         jerseyEnvironment.register(new FirmaDigitalExcepcionGeneralExceptionMapper());
+        aplicacion.run(configuracion, ambiente);
     }
+
 
     private void configurarRecursoFirmaDigital(ServicioConfiguration configuracion, JerseyEnvironment jerseyEnvironment) {
         AliasProvider aliasProvider = new AliasProvider();
@@ -91,11 +106,6 @@ public class ServicioApplication extends MicroservicioAplicacion<ServicioConfigu
             LOGGER.log(Level.FINEST, "Error al crear el almacen de llaves y la firma digital", e);
         }
         return null;
-    }
-
-    @Override
-    protected HibernateBundle<ServicioConfiguration> getHibernate() {
-        return hibernate;
     }
 
     @VisibleForTesting

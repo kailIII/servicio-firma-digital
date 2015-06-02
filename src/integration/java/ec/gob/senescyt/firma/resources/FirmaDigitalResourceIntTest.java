@@ -6,7 +6,7 @@ import ec.gob.senescyt.firma.core.ConfiguracionFirma;
 import ec.gob.senescyt.firma.dao.ConfiguracionFirmaDAO;
 import ec.gob.senescyt.firma.exceptions.mappers.Errores;
 import ec.gob.senescyt.sniese.commons.core.InformacionFirma;
-import ec.gob.senescyt.sniese.commons.security.UsuarioAutenticado;
+import ec.gob.senescyt.sniese.commons.tests.builders.UsuarioAutenticadoBuilder;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class FirmaDigitalResourceIntTest extends FirmaDigitalBaseIntTest {
     public void setUp() throws Exception {
         super.setUp();
         nombreUsuario = randomAlphabetic(10);
-        configurarUsuarioConPermisos(new UsuarioAutenticado(nombreUsuario, randomAlphabetic(5)));
+        configurarUsuarioAutenticado(UsuarioAutenticadoBuilder.nuevo().con(u -> u.nombreUsuario = nombreUsuario).generar());
     }
 
     @Test

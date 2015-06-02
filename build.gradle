@@ -67,14 +67,14 @@ dependencies {
             'org.postgresql:postgresql:9.3-1101-jdbc41',
             'org.flywaydb:flyway-core:3.0',
             'commons-validator:commons-validator:1.4.0',
-            'ec.gob.senescyt:sniese-commons:1.1.8',
+            'ec.gob.senescyt:sniese-commons:1.1.21',
             'com.github.oxo42:stateless4j:2.4.2'
     )
     testCompile(
             'org.hamcrest:hamcrest-all:1.3',
             'org.powermock:powermock-module-junit4:1.5.6',
             'org.powermock:powermock-api-mockito:1.5.6',
-            'ec.gob.senescyt:sniese-commons-test:1.0.8'
+            'ec.gob.senescyt:sniese-commons-test:1.0.11'
     )
 }
 
