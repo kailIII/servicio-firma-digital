@@ -1,7 +1,7 @@
 database:
   driverClass: org.postgresql.Driver
   user: thoughtworks
-  password: Passw0rd
+  password: ${passwordBaseDeDatos}
   url: jdbc:postgresql://${host}/senescyt
 
   properties:

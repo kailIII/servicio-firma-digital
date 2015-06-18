@@ -15,6 +15,7 @@ project.ext {
 
 task expandirConfig(type: Copy) {
     def hostBaseDeDatos = obtenerValorDesdeVariableDeEntorno("IP_BASE_DATOS_PREPRO", "localhost")
+    def passwordBaseDeDatos = obtenerValorDesdeVariableDeEntorno("PASSWORD_BASE_DATOS", "Passw0rd")
     def clave = obtenerValorDesdeVariableDeEntorno("CLAVE_SNIESE_KEY_STORE", "sniese")
     def activarProxyProduccion = obtenerValorDesdeVariableDeEntorno("ACTIVAR_PROXY_PRODUCCION", "false")
     def urlBaseAutorizacion = obtenerValorDesdeVariableDeEntorno("URL_BASE_AUTORIZACION", "https://localhost:8443/")
@@ -117,6 +118,7 @@ task expandirConfig(type: Copy) {
     rename { String fileName -> fileName.replace('.template', '') }
     expand(
             host: hostBaseDeDatos,
+            passwordBaseDeDatos: passwordBaseDeDatos,
             claveSnieseKeyStore: clave,
             proxyActivo: activarProxyProduccion,
             urlBaseAutorizacion: urlBaseAutorizacion,
