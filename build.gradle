@@ -62,7 +62,6 @@ dependencies {
             'io.dropwizard:dropwizard-core:' + dropwizardVersion,
             'io.dropwizard:dropwizard-testing:' + dropwizardVersion,
             'io.dropwizard:dropwizard-hibernate:' + dropwizardVersion,
-            'io.dropwizard:dropwizard-metrics-graphite:' + dropwizardVersion,
             'org.slf4j:slf4j-api:1.7.5',
             'org.postgresql:postgresql:9.3-1101-jdbc41',
             'org.flywaydb:flyway-core:3.0',
